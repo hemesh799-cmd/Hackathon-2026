@@ -1,7 +1,7 @@
 This document records the exact prompt structure used during the development of ABTalks — 60-Day Build Journey.
 
 PROMPT 1 — Project Foundation + Design System
-Set up the React, Vite, React Router, Tailwind CSS, and Lucide React foundations. Establish design system parameters:
+Set up the React, Vite, React Router, styles.css, and Lucide React foundations. Establish design system parameters:
 
 Background: #F7F7F5
 Primary text: #111111
