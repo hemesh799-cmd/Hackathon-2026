@@ -5,10 +5,10 @@
 
   // --- Starter Code Templates ---
   const STARTER_CODES = {
-    python: `def find_largest(arr):\n    # Write your solution here\n    return max(arr)\n\n# Input parsing\nn = int(input())\narr = list(map(int, input().split()))\nprint(find_largest(arr))`,
-    cpp: `#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint findLargest(vector<int>& arr) {\n    int maxVal = arr[0];\n    for(int x : arr) {\n        if(x > maxVal) maxVal = x;\n    }\n    return maxVal;\n}\n\nint main() {\n    int n;\n    if(cin >> n) {\n        vector<int> arr(n);\n        for(int i = 0; i < n; i++) cin >> arr[i];\n        cout << findLargest(arr);\n    }\n    return 0;\n}`,
-    c: `#include <stdio.h>\n\nint findLargest(int arr[], int n) {\n    int max = arr[0];\n    for (int i = 1; i < n; i++) {\n        if (arr[i] > max) max = arr[i];\n    }\n    return max;\n}\n\nint main() {\n    int n;\n    if (scanf("%d", &n) == 1) {\n        int arr[n];\n        for (int i = 0; i < n; i++) scanf("%d", &arr[i]);\n        printf("%d", findLargest(arr, n));\n    }\n    return 0;\n}`,
-    java: `import java.util.Scanner;\n\npublic class Solution {\n    public static int findLargest(int[] arr) {\n        int max = arr[0];\n        for (int x : arr) {\n            if (x > max) max = x;\n        }\n        return max;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int[] arr = new int[n];\n            for (int i = 0; i < n; i++) arr[i] = sc.nextInt();\n            System.out.print(findLargest(arr));\n        }\n    }\n}`
+    python: `def solve():\n    # Write your solution here\n    n = int(input())\n    arr = list(map(int, input().split()))\n    print(max(arr))\n\nsolve()`,
+    cpp: `#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint findLargest(vector<int>& arr) {\n    int maxVal = arr[0];\n    for(int x : arr) if(x > maxVal) maxVal = x;\n    return maxVal;\n}\n\nint main() {\n    int n;\n    if(cin >> n) {\n        vector<int> arr(n);\n        for(int i = 0; i < n; i++) cin >> arr[i];\n        cout << findLargest(arr);\n    }\n    return 0;\n}`,
+    c: `#include <stdio.h>\n\nint findLargest(int arr[], int n) {\n    int max = arr[0];\n    for (int i = 1; i < n; i++) if (arr[i] > max) max = arr[i];\n    return max;\n}\n\nint main() {\n    int n;\n    if (scanf("%d", &n) == 1) {\n        int arr[n];\n        for (int i = 0; i < n; i++) scanf("%d", &arr[i]);\n        printf("%d", findLargest(arr, n));\n    }\n    return 0;\n}`,
+    java: `import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int max = Integer.MIN_VALUE;\n            for (int i = 0; i < n; i++) {\n                int val = sc.nextInt();\n                if (val > max) max = val;\n            }\n            System.out.print(max);\n        }\n    }\n}`
   };
 
   // --- Initial Default State ---
@@ -252,14 +252,42 @@
       }
     }
 
-    // 2. Coding Progress Card
+    // 2. Today's Progress Card
+    const todayProgressContainer = document.getElementById("dashboard-today-progress");
+    if (todayProgressContainer) {
+      const hasGh = !!appState.day12.githubProof;
+      const hasLi = !!appState.day12.linkedinProof;
+      todayProgressContainer.innerHTML = `
+        <div class="card-title">
+          <span>TODAY'S PROGRESS</span>
+          <span class="badge">Day 12 Checklist</span>
+        </div>
+        <div class="today-checklist">
+          <div class="checklist-item done">✓ Mission Brief</div>
+          <div class="checklist-item done">✓ Learn Concepts</div>
+          <div class="checklist-item ${appState.day12.testCompleted ? 'done' : 'pending'}">
+            ${appState.day12.testCompleted ? '✓ MCQ Quick Check' : '○ MCQ Quick Check'}
+          </div>
+          <div class="checklist-item ${appState.day12.codePassed ? 'done' : 'pending'}">
+            ${appState.day12.codePassed ? '✓ Coding Challenge' : '○ Coding Challenge'}
+          </div>
+          <div class="checklist-item ${hasGh ? 'done' : 'pending'}">
+            ${hasGh ? '✓ GitHub Proof' : '○ GitHub Proof'}
+          </div>
+          <div class="checklist-item ${hasLi ? 'done' : 'pending'}">
+            ${hasLi ? '✓ LinkedIn Proof' : '○ LinkedIn Proof'}
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. Coding Progress Card
     const codingProgressContainer = document.getElementById("dashboard-coding-progress");
     if (codingProgressContainer) {
       const p = appState.codingProgress;
       codingProgressContainer.innerHTML = `
         <div class="card-title">
           <span>CODING PROGRESS</span>
-          <span class="badge">Neo Colab Platform</span>
         </div>
         <div class="coding-progress-grid">
           <div>
@@ -272,24 +300,17 @@
           </div>
           <div>
             <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.accuracy}%</div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Accuracy</div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">MCQ Accuracy</div>
           </div>
           <div>
             <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.codingStreak} 🔥</div>
             <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Coding Streak</div>
           </div>
         </div>
-        <div class="progress-bar-container">
-          <div class="progress-bar-fill" style="width: ${p.progressPct}%;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 6px; font-weight: 600;">
-          <span>Target Progress</span>
-          <span>${p.progressPct}%</span>
-        </div>
       `;
     }
 
-    // 3. Build Chain
+    // 4. Build Chain
     const chainContainer = document.getElementById("build-chain-grid");
     if (chainContainer) {
       chainContainer.innerHTML = "";
@@ -322,7 +343,7 @@
       }
     }
 
-    // 4. Streak Recovery Banner
+    // 5. Streak Recovery Banner
     const recoveryContainer = document.getElementById("recovery-banner-slot");
     if (recoveryContainer) {
       if (!appState.missedDay.isRecovered) {
@@ -345,7 +366,7 @@
       }
     }
 
-    // 5. Stats Grid
+    // 6. Stats Grid
     const statDays = document.getElementById("stat-days-built");
     const statStreak = document.getElementById("stat-streak");
     const statTests = document.getElementById("stat-tests");
@@ -358,7 +379,7 @@
     if (statAvg) statAvg.innerText = `${appState.stats.avgScore}%`;
     if (statBuilds) statBuilds.innerText = appState.stats.buildsShipped;
 
-    // 6. Achievements
+    // 7. Achievements
     const achievementsContainer = document.getElementById("achievements-grid");
     if (achievementsContainer) {
       achievementsContainer.innerHTML = "";
@@ -486,10 +507,11 @@
     const learnDone = appState.day12.learnCompleted;
     const testDone = appState.day12.testCompleted;
     const codeDone = appState.day12.codePassed;
+    const testCaseDone = appState.day12.codeExecuted;
     const proofDone = !!(appState.day12.githubProof && appState.day12.linkedinProof);
 
     container.innerHTML = `
-      <!-- 6-Stage Progress Indicator Stepper -->
+      <!-- 7-Stage Progress Indicator Stepper: BUILD -> LEARN -> MCQ -> CODE -> TEST -> PROVE -> SHIP -->
       <div class="stage-stepper">
         <div class="stage-step ${missionDone ? 'completed' : 'active'}">
           <div class="stage-dot">${missionDone ? '✓' : '1'}</div>
@@ -511,13 +533,18 @@
           <span>CODE</span>
         </div>
         <div class="stage-line"></div>
-        <div class="stage-step ${proofDone ? 'completed' : (codeDone ? 'active' : '')}">
-          <div class="stage-dot">${proofDone ? '✓' : '5'}</div>
+        <div class="stage-step ${testCaseDone ? 'completed' : (codeDone ? 'active' : '')}">
+          <div class="stage-dot">${testCaseDone ? '✓' : '5'}</div>
+          <span>TEST</span>
+        </div>
+        <div class="stage-line"></div>
+        <div class="stage-step ${proofDone ? 'completed' : (testCaseDone ? 'active' : '')}">
+          <div class="stage-dot">${proofDone ? '✓' : '6'}</div>
           <span>PROOF</span>
         </div>
         <div class="stage-line"></div>
         <div class="stage-step ${appState.day12.daySubmitted ? 'completed' : ''}">
-          <div class="stage-dot">6</div>
+          <div class="stage-dot">7</div>
           <span>SHIP</span>
         </div>
       </div>
@@ -526,7 +553,7 @@
       <div class="card">
         <div class="mission-header">
           <div class="mission-tag">Day 12 Mission</div>
-          <h2 class="mission-title">Mobile Layouts & Array Algorithms</h2>
+          <h2 class="mission-title">Find Largest Element & Responsive Viewports</h2>
           <p class="mission-desc">Solve array optimization algorithms and build mobile responsive viewports.</p>
         </div>
       </div>
@@ -534,41 +561,47 @@
       <!-- Quick MCQ Section -->
       <div class="card" id="quiz-card">
         <div class="card-title">
-          <span>QUICK CHECK</span>
-          <span class="badge">${testDone ? 'Complete 🎉' : 'MCQ Test'}</span>
+          <span>Quick Coding Check</span>
+          <span class="badge">${testDone ? 'Complete 🎉' : '5 Questions'}</span>
         </div>
         <div id="quiz-body"></div>
       </div>
 
-      <!-- Coding Challenge Section -->
+      <!-- Coding Problem Section -->
       <div class="card" id="coding-card">
         <div class="card-title">
-          <span>Today's Coding Challenge</span>
+          <span>Today's Coding Problem</span>
           <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">Easy • +50 XP</span>
         </div>
         
         <div class="challenge-spec-box">
-          <div style="font-weight: 800; font-size: 14px; margin-bottom: 6px;">Find Largest Element in Array</div>
-          <p style="color: var(--text-secondary); margin-bottom: 8px;">Write a program to find the largest element in an array.</p>
+          <div style="font-weight: 800; font-size: 15px; margin-bottom: 4px;">Find the Largest Element</div>
+          <p style="color: var(--text-secondary); margin-bottom: 8px;">Given an array of integers, find and print the largest element.</p>
           
           <div class="spec-title">Input Format:</div>
           <div class="spec-code-block">First line contains integer N.\nSecond line contains N space-separated integers.</div>
           
           <div class="spec-title">Output Format:</div>
-          <div class="spec-code-block">Print single integer representing the maximum element.</div>
+          <div class="spec-code-block">Print a single integer representing the maximum element in the array.</div>
 
           <div class="spec-title">Constraints:</div>
           <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">1 <= N <= 10^5</div>
+
+          <div class="spec-title">Sample Input:</div>
+          <div class="spec-code-block">5\n10 20 5 30 15</div>
+
+          <div class="spec-title">Sample Output:</div>
+          <div class="spec-code-block">30</div>
         </div>
 
         <div class="lang-selector-row">
           <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Language:</span>
-          <div class="lang-tabs">
-            <button class="lang-tab ${appState.day12.codeLanguage === 'c' ? 'active' : ''}" data-lang="c">C</button>
-            <button class="lang-tab ${appState.day12.codeLanguage === 'cpp' ? 'active' : ''}" data-lang="cpp">C++</button>
-            <button class="lang-tab ${appState.day12.codeLanguage === 'java' ? 'active' : ''}" data-lang="java">Java</button>
-            <button class="lang-tab ${appState.day12.codeLanguage === 'python' ? 'active' : ''}" data-lang="python">Python</button>
-          </div>
+          <select id="lang-select-dropdown" class="lang-select-dropdown">
+            <option value="python" ${appState.day12.codeLanguage === 'python' ? 'selected' : ''}>Python ▼</option>
+            <option value="c" ${appState.day12.codeLanguage === 'c' ? 'selected' : ''}>C ▼</option>
+            <option value="cpp" ${appState.day12.codeLanguage === 'cpp' ? 'selected' : ''}>C++ ▼</option>
+            <option value="java" ${appState.day12.codeLanguage === 'java' ? 'selected' : ''}>Java ▼</option>
+          </select>
         </div>
 
         <textarea id="code-editor" class="editor-textarea" spellcheck="false">${appState.day12.codeContent}</textarea>
@@ -578,9 +611,9 @@
         <div class="test-cases-box">
           <div class="test-case-card">
             <div class="test-case-header">
-              <span>Test Case 1</span>
+              <span>✓ Test Case 1</span>
               <span id="tc-1-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
-                ${appState.day12.codeExecuted ? '✓ Passed' : '○ Pending'}
+                ${appState.day12.codeExecuted ? 'Passed' : 'Pending'}
               </span>
             </div>
             <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Input: 5 \n 10 20 5 30 15</div>
@@ -589,9 +622,9 @@
 
           <div class="test-case-card">
             <div class="test-case-header">
-              <span>Test Case 2</span>
+              <span>✓ Test Case 2</span>
               <span id="tc-2-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
-                ${appState.day12.codeExecuted ? '✓ Passed' : '○ Pending'}
+                ${appState.day12.codeExecuted ? 'Passed' : 'Pending'}
               </span>
             </div>
             <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Input: 4 \n 7 3 9 2</div>
@@ -600,12 +633,12 @@
 
           <div class="test-case-card">
             <div class="test-case-header">
-              <span>Test Case 3 (Hidden)</span>
+              <span>✗ Test Case 3 (Hidden)</span>
               <span id="tc-3-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
-                ${appState.day12.codeExecuted ? '✓ Passed' : '○ Hidden'}
+                ${appState.day12.codeExecuted ? 'Passed' : 'Hidden'}
               </span>
             </div>
-            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Hidden evaluation case</div>
+            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Hidden mock evaluation case</div>
           </div>
         </div>
 
@@ -639,25 +672,24 @@
       </div>
     `;
 
-    // Language tabs event listener
-    container.querySelectorAll(".lang-tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        const lang = tab.dataset.lang;
-        appState.day12.codeLanguage = lang;
-        appState.day12.codeContent = STARTER_CODES[lang];
-        saveState();
-        renderDay12View();
-      });
+    // Dropdown change handler
+    const langSelect = document.getElementById("lang-select-dropdown");
+    langSelect?.addEventListener("change", () => {
+      const lang = langSelect.value;
+      appState.day12.codeLanguage = lang;
+      appState.day12.codeContent = STARTER_CODES[lang];
+      saveState();
+      renderDay12View();
     });
 
-    // Editor textarea event listener
+    // Editor textarea change
     const codeEditor = document.getElementById("code-editor");
     codeEditor?.addEventListener("input", () => {
       appState.day12.codeContent = codeEditor.value;
       saveState();
     });
 
-    // Run Code Action
+    // Run & Submit Code Action
     document.getElementById("btn-run-code")?.addEventListener("click", runCodeRunner);
     document.getElementById("btn-submit-code")?.addEventListener("click", submitCodeRunner);
 
@@ -696,17 +728,16 @@
         <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px;">
           <div style="font-weight: 800; color: var(--success-color); margin-bottom: 4px;">Test Results: 3 / 3 Test Cases Passed</div>
           <div style="font-size: 12px; color: var(--text-secondary);">✓ Test Case 1 Passed • ✓ Test Case 2 Passed • ✓ Test Case 3 Passed</div>
-          <div style="font-size: 11px; color: var(--accent-color); font-weight: 700; margin-top: 4px;">Execution Time: 42 ms</div>
         </div>
       `;
     }
 
-    document.getElementById("tc-1-status").className = "test-status passed";
-    document.getElementById("tc-1-status").innerText = "✓ Passed";
-    document.getElementById("tc-2-status").className = "test-status passed";
-    document.getElementById("tc-2-status").innerText = "✓ Passed";
-    document.getElementById("tc-3-status").className = "test-status passed";
-    document.getElementById("tc-3-status").innerText = "✓ Passed";
+    const tc1 = document.getElementById("tc-1-status");
+    const tc2 = document.getElementById("tc-2-status");
+    const tc3 = document.getElementById("tc-3-status");
+    if (tc1) { tc1.className = "test-status passed"; tc1.innerText = "Passed"; }
+    if (tc2) { tc2.className = "test-status passed"; tc2.innerText = "Passed"; }
+    if (tc3) { tc3.className = "test-status passed"; tc3.innerText = "Passed"; }
   }
 
   function submitCodeRunner() {
@@ -715,21 +746,17 @@
     appState.codingProgress.problemsSolved = 19;
     saveState();
 
-    // Show Coding Result Screen Dialog
+    // Show Coding Result Popup Modal
     const drawer = document.getElementById("detail-modal");
     if (drawer) {
       drawer.innerHTML = `
         <div class="drawer-content" style="text-align: center;">
           <div class="drawer-handle"></div>
-          <div style="font-size: 40px; margin-bottom: 8px;">🎉</div>
-          <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">CODE SUBMITTED</h2>
-          <div style="font-size: 15px; font-weight: 700; color: var(--success-color); margin-bottom: 16px;">3 / 3 TESTS PASSED</div>
+          <div style="font-size: 38px; margin-bottom: 4px;">🎉</div>
+          <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Problem Solved!</h2>
+          <div style="font-size: 14px; font-weight: 700; color: var(--success-color); margin-bottom: 16px;">3 / 3 Test Cases Passed</div>
           
           <div class="celebration-metrics">
-            <div class="metric-row">
-              <span class="metric-lbl">Runtime</span>
-              <span class="metric-val">42 ms</span>
-            </div>
             <div class="metric-row">
               <span class="metric-lbl">Accuracy</span>
               <span class="metric-val" style="color: var(--success-color)">100%</span>
@@ -739,8 +766,8 @@
               <span class="metric-val">Easy</span>
             </div>
             <div class="metric-row">
-              <span class="metric-lbl">Reward</span>
-              <span class="metric-val" style="color: var(--accent-color)">+50 XP</span>
+              <span class="metric-lbl">XP Earned</span>
+              <span class="metric-val" style="color: var(--accent-color)">+50</span>
             </div>
             <div class="metric-row">
               <span class="metric-lbl">Streak</span>
@@ -748,11 +775,11 @@
             </div>
           </div>
 
-          <button class="btn-primary" id="btn-continue-day">Continue Day →</button>
+          <button class="btn-primary" id="btn-continue-challenge">Continue Challenge →</button>
         </div>
       `;
       document.getElementById("modal-overlay")?.classList.add("active");
-      document.getElementById("btn-continue-day")?.addEventListener("click", () => {
+      document.getElementById("btn-continue-challenge")?.addEventListener("click", () => {
         closeModal();
         renderDay12View();
       });
