@@ -27,7 +27,7 @@
       isRecovered: false
     },
     stats: {
-      daysBuilt: 12, // overall count
+      daysBuilt: 12,
       streak: 11,
       testsCompleted: 10,
       avgScore: 86,
@@ -55,7 +55,7 @@
         { letter: "D", text: "visibility" }
       ],
       correct: "B",
-      explanation: "The 'display' property (e.g. display: flex or display: grid) forms the core foundation of modern responsive CSS layouts."
+      explanation: "The 'display' property (display: flex / display: grid) forms the core foundation of responsive CSS layouts."
     },
     {
       id: 2,
@@ -67,7 +67,7 @@
         { letter: "D", text: '<meta name="zoom" content="disable">' }
       ],
       correct: "A",
-      explanation: "The viewport meta tag instructs mobile browsers to render the page width relative to the screen dimensions."
+      explanation: "The viewport meta tag instructs browsers to scale page dimensions to fit the device screen width."
     },
     {
       id: 3,
@@ -79,7 +79,7 @@
         { letter: "D", text: "flex-direction" }
       ],
       correct: "B",
-      explanation: "'justify-content' aligns flex items along the primary layout axis."
+      explanation: "'justify-content' distributes flex items along the main axis."
     },
     {
       id: 4,
@@ -91,7 +91,7 @@
         { letter: "D", text: "@media mobile-only" }
       ],
       correct: "B",
-      explanation: "'(max-width: 480px)' applies styles only when the viewport width is 480 pixels or less."
+      explanation: "'(max-width: 480px)' matches screen sizes 480px wide or smaller."
     },
     {
       id: 5,
@@ -103,20 +103,19 @@
         { letter: "D", text: "vh" },
       ],
       correct: "B",
-      explanation: "'rem' scales relative to the root (<html>) font size."
+      explanation: "'rem' scales proportionately to the root font size."
     }
   ];
 
-  // Load state from localStorage or use default
+  // State loading & persistence
   let appState = (function loadState() {
     try {
       const saved = localStorage.getItem("abtalks_state");
       if (saved) {
-        const parsed = JSON.parse(saved);
-        return { ...DEFAULT_STATE, ...parsed };
+        return { ...DEFAULT_STATE, ...JSON.parse(saved) };
       }
     } catch (e) {
-      console.warn("Failed to parse localStorage state", e);
+      console.warn("Failed to load state", e);
     }
     return DEFAULT_STATE;
   })();
@@ -125,11 +124,11 @@
     try {
       localStorage.setItem("abtalks_state", JSON.stringify(appState));
     } catch (e) {
-      console.error("Failed to save state to localStorage", e);
+      console.error("Failed to save state", e);
     }
   }
 
-  // --- Theme Management ---
+  // Theme support
   function applyTheme(theme) {
     let effectiveTheme = theme;
     if (theme === "system") {
@@ -142,7 +141,6 @@
       document.documentElement.removeAttribute("data-theme");
     }
 
-    // Update buttons state in drawer if open
     document.querySelectorAll(".theme-opt-btn").forEach(btn => {
       if (btn.dataset.themeVal === theme) {
         btn.classList.add("selected");
@@ -152,32 +150,35 @@
     });
   }
 
-  // Listen to system theme changes
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-    if (appState.theme === "system") {
-      applyTheme("system");
-    }
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (appState.theme === "system") applyTheme("system");
   });
 
-  // --- Router ---
+  // Routing
   function navigateTo(path, pushState = true) {
     if (pushState) {
-      history.pushState({ path }, "", path);
+      try {
+        history.pushState({ path }, "", path);
+      } catch (e) {
+        window.location.hash = path;
+      }
     }
     renderRoute(path);
   }
 
   function getNormalizedPath() {
-    let rawPath = window.location.pathname;
-    // Strip trailing slashes or base subfolder if gh-pages
-    rawPath = rawPath.replace(/\/+$/, "");
+    const hash = window.location.hash;
+    if (hash && hash.includes("day/12")) return "/day/12";
+    if (hash && hash.includes("dashboard")) return "/dashboard";
+
+    let rawPath = window.location.pathname.replace(/\/+$/, "");
     if (rawPath.includes("/day/12") || rawPath.endsWith("day/12")) {
       return "/day/12";
     }
     if (rawPath.includes("/dashboard") || rawPath.endsWith("dashboard")) {
       return "/dashboard";
     }
-    return "/dashboard"; // Default to dashboard
+    return "/dashboard";
   }
 
   function renderRoute(path) {
@@ -187,121 +188,135 @@
     document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
 
     if (norm === "/day/12") {
-      document.getElementById("view-day12").classList.add("active");
-      document.getElementById("nav-day12").classList.add("active");
+      const viewDay12 = document.getElementById("view-day12");
+      const navDay12 = document.getElementById("nav-day12");
+      if (viewDay12) viewDay12.classList.add("active");
+      if (navDay12) navDay12.classList.add("active");
       renderDay12View();
     } else {
-      document.getElementById("view-dashboard").classList.add("active");
-      document.getElementById("nav-dashboard").classList.add("active");
+      const viewDash = document.getElementById("view-dashboard");
+      const navDash = document.getElementById("nav-dashboard");
+      if (viewDash) viewDash.classList.add("active");
+      if (navDash) navDash.classList.add("active");
       renderDashboardView();
     }
     window.scrollTo(0, 0);
   }
 
-  window.addEventListener("popstate", () => {
-    renderRoute(getNormalizedPath());
-  });
+  window.addEventListener("popstate", () => renderRoute(getNormalizedPath()));
+  window.addEventListener("hashchange", () => renderRoute(getNormalizedPath()));
 
-  // --- Dashboard Rendering ---
+  // Render Dashboard
   function renderDashboardView() {
-    // 1. Reminder Component
     const reminderCard = document.getElementById("dashboard-reminder");
-    if (appState.day12.daySubmitted) {
-      reminderCard.innerHTML = `
-        <div class="reminder-header">
-          <span class="reminder-icon">✓</span>
-          <span class="reminder-title">Today's build is complete</span>
-        </div>
-        <p class="reminder-sub">Come back tomorrow for Day 13.</p>
-        <button class="btn-secondary" id="btn-view-submission">View Day 12 Submission ✓</button>
-      `;
-      document.getElementById("btn-view-submission").addEventListener("click", () => navigateTo("/day/12"));
-    } else {
-      reminderCard.innerHTML = `
-        <div class="reminder-header">
-          <span class="reminder-icon">🔥</span>
-          <span class="reminder-title">Today's build is waiting.</span>
-        </div>
-        <p class="reminder-sub">Estimated time: 45 min • Mobile Layouts & Flexbox</p>
-        <button class="btn-primary" id="btn-start-mission">Start today's mission →</button>
-      `;
-      document.getElementById("btn-start-mission").addEventListener("click", () => navigateTo("/day/12"));
-    }
-
-    // 2. Build Chain Grid
-    const chainContainer = document.getElementById("build-chain-grid");
-    chainContainer.innerHTML = "";
-
-    // 60 days
-    for (let day = 1; day <= 60; day++) {
-      const bubble = document.createElement("div");
-      bubble.className = "day-bubble";
-      bubble.innerText = day;
-
-      if (day < 11) {
-        bubble.classList.add("completed");
-      } else if (day === 11) {
-        if (appState.missedDay.isRecovered) {
-          bubble.classList.add("completed");
-        } else {
-          bubble.classList.add("missed");
-          bubble.innerText = "11 !";
-        }
-      } else if (day === 12) {
-        if (appState.day12.daySubmitted) {
-          bubble.classList.add("completed");
-        } else {
-          bubble.classList.add("current");
-        }
+    if (reminderCard) {
+      if (appState.day12.daySubmitted) {
+        reminderCard.innerHTML = `
+          <div class="reminder-header">
+            <span class="reminder-icon">✓</span>
+            <span class="reminder-title">Today's build is complete ✓</span>
+          </div>
+          <p class="reminder-sub">Come back tomorrow for Day 13.</p>
+          <button class="btn-secondary" id="btn-view-submission">View Day 12 Submission ✓</button>
+        `;
+        document.getElementById("btn-view-submission")?.addEventListener("click", () => navigateTo("/day/12"));
       } else {
-        bubble.classList.add("future");
+        reminderCard.innerHTML = `
+          <div class="reminder-header">
+            <span class="reminder-icon">🔥</span>
+            <span class="reminder-title">Today's build is waiting.</span>
+          </div>
+          <p class="reminder-sub">Estimated time: 45 min • Mobile Layouts & Flexbox</p>
+          <button class="btn-primary" id="btn-start-mission">Start today's mission →</button>
+        `;
+        document.getElementById("btn-start-mission")?.addEventListener("click", () => navigateTo("/day/12"));
       }
-
-      bubble.addEventListener("click", () => showDayDetailModal(day));
-      chainContainer.appendChild(bubble);
     }
 
-    // Streak Recovery Banner
+    // Build Chain
+    const chainContainer = document.getElementById("build-chain-grid");
+    if (chainContainer) {
+      chainContainer.innerHTML = "";
+      for (let day = 1; day <= 60; day++) {
+        const bubble = document.createElement("div");
+        bubble.className = "day-bubble";
+        bubble.innerText = day;
+
+        if (day < 11) {
+          bubble.classList.add("completed");
+        } else if (day === 11) {
+          if (appState.missedDay.isRecovered) {
+            bubble.classList.add("completed");
+          } else {
+            bubble.classList.add("missed");
+            bubble.innerText = "11 !";
+          }
+        } else if (day === 12) {
+          if (appState.day12.daySubmitted) {
+            bubble.classList.add("completed");
+          } else {
+            bubble.classList.add("current");
+          }
+        } else {
+          bubble.classList.add("future");
+        }
+
+        bubble.addEventListener("click", () => showDayDetailModal(day));
+        chainContainer.appendChild(bubble);
+      }
+    }
+
+    // Streak Recovery
     const recoveryContainer = document.getElementById("recovery-banner-slot");
-    if (!appState.missedDay.isRecovered) {
-      recoveryContainer.style.display = "block";
-      recoveryContainer.innerHTML = `
-        <div class="recovery-banner">
-          <div class="recovery-title">You missed yesterday.</div>
-          <div class="recovery-desc">Your journey isn't over. You have 1 streak recovery available.</div>
-          <button class="recovery-btn" id="btn-recover-streak">Recover My Streak</button>
-        </div>
-      `;
-      document.getElementById("btn-recover-streak").addEventListener("click", recoverStreak);
-    } else {
-      recoveryContainer.style.display = "block";
-      recoveryContainer.innerHTML = `
-        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 10px 14px; color: var(--success-color); font-size: 13px; font-weight: 700; margin-top: 10px;">
-          Streak recovered 🔥 (Day 11 restored)
-        </div>
-      `;
+    if (recoveryContainer) {
+      if (!appState.missedDay.isRecovered) {
+        recoveryContainer.style.display = "block";
+        recoveryContainer.innerHTML = `
+          <div class="recovery-banner">
+            <div class="recovery-title">You missed yesterday.</div>
+            <div class="recovery-desc">Your journey isn't over. You have 1 streak recovery available.</div>
+            <button class="recovery-btn" id="btn-recover-streak">Recover My Streak</button>
+          </div>
+        `;
+        document.getElementById("btn-recover-streak")?.addEventListener("click", recoverStreak);
+      } else {
+        recoveryContainer.style.display = "block";
+        recoveryContainer.innerHTML = `
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 10px 14px; color: var(--success-color); font-size: 13px; font-weight: 700; margin-top: 10px;">
+            Streak recovered 🔥 (Day 11 restored)
+          </div>
+        `;
+      }
     }
 
-    // 3. Progress Stats Card Updates
-    document.getElementById("stat-days-built").innerText = `${appState.stats.daysBuilt} / 60`;
-    document.getElementById("stat-streak").innerText = `${appState.stats.streak} days`;
-    document.getElementById("stat-tests").innerText = appState.stats.testsCompleted;
-    document.getElementById("stat-avg-score").innerText = `${appState.stats.avgScore}%`;
-    document.getElementById("stat-builds").innerText = appState.stats.buildsShipped;
+    // Stats
+    const statDays = document.getElementById("stat-days-built");
+    const statStreak = document.getElementById("stat-streak");
+    const statTests = document.getElementById("stat-tests");
+    const statAvg = document.getElementById("stat-avg-score");
+    const statBuilds = document.getElementById("stat-builds");
 
-    // 4. Achievements Grid
+    if (statDays) statDays.innerText = `${appState.stats.daysBuilt} / 60`;
+    if (statStreak) statStreak.innerText = `${appState.stats.streak} days`;
+    if (statTests) statTests.innerText = appState.stats.testsCompleted;
+    if (statAvg) statAvg.innerText = `${appState.stats.avgScore}%`;
+    if (statBuilds) statBuilds.innerText = appState.stats.buildsShipped;
+
+    // Achievements
     const achievementsContainer = document.getElementById("achievements-grid");
-    achievementsContainer.innerHTML = "";
-    appState.achievements.forEach(ach => {
-      const card = document.createElement("div");
-      card.className = `achievement-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
-      card.innerHTML = `
-        <div class="achievement-icon">${ach.icon}</div>
-        <div class="achievement-title">${ach.title}</div>
-        <div class="achievement-desc">${ach.desc}</div>
-      `;
-      achievementsContainer.appendChild(card);
-    });
+    if (achievementsContainer) {
+      achievementsContainer.innerHTML = "";
+      appState.achievements.forEach(ach => {
+        const card = document.createElement("div");
+        card.className = `achievement-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
+        card.innerHTML = `
+          <div class="achievement-icon">${ach.icon}</div>
+          <div class="achievement-title">${ach.title}</div>
+          <div class="achievement-desc">${ach.desc}</div>
+        `;
+        achievementsContainer.appendChild(card);
+      });
+    }
   }
 
   function recoverStreak() {
@@ -311,10 +326,9 @@
     renderDashboardView();
   }
 
-  // --- Modal for Day Detail ---
   function showDayDetailModal(dayNum) {
     let statusText = "Future Day";
-    let detailText = "Challenge details will unlock on day " + dayNum + ".";
+    let detailText = `Challenge details will unlock on day ${dayNum}.`;
     let scoreText = "";
 
     if (dayNum < 11) {
@@ -338,48 +352,49 @@
     }
 
     const drawer = document.getElementById("detail-modal");
-    drawer.innerHTML = `
-      <div class="drawer-content">
-        <div class="drawer-handle"></div>
-        <div class="card-title">
-          <span>DAY ${dayNum}</span>
-          <span class="badge">${statusText}</span>
+    if (drawer) {
+      drawer.innerHTML = `
+        <div class="drawer-content">
+          <div class="drawer-handle"></div>
+          <div class="card-title">
+            <span>DAY ${dayNum}</span>
+            <span class="badge">${statusText}</span>
+          </div>
+          <p style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">${detailText}</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">${scoreText}</p>
+          ${dayNum === 12 ? '<button class="btn-primary" id="modal-btn-day12">Go to Day 12 →</button>' : ''}
+          <button class="btn-secondary" style="margin-top: 10px;" id="modal-btn-close">Close</button>
         </div>
-        <p style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">${detailText}</p>
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">${scoreText}</p>
-        ${dayNum === 12 ? '<button class="btn-primary" id="modal-btn-day12">Go to Day 12 →</button>' : ''}
-        <button class="btn-secondary" style="margin-top: 10px;" id="modal-btn-close">Close</button>
-      </div>
-    `;
+      `;
+      document.getElementById("modal-overlay")?.classList.add("active");
 
-    document.getElementById("modal-overlay").classList.add("active");
-
-    if (dayNum === 12) {
-      document.getElementById("modal-btn-day12").addEventListener("click", () => {
-        closeModal();
-        navigateTo("/day/12");
-      });
+      if (dayNum === 12) {
+        document.getElementById("modal-btn-day12")?.addEventListener("click", () => {
+          closeModal();
+          navigateTo("/day/12");
+        });
+      }
+      document.getElementById("modal-btn-close")?.addEventListener("click", closeModal);
     }
-    document.getElementById("modal-btn-close").addEventListener("click", closeModal);
   }
 
   function closeModal() {
-    document.getElementById("modal-overlay").classList.remove("active");
+    document.getElementById("modal-overlay")?.classList.remove("active");
   }
 
-  // --- Day 12 View Rendering & Quiz Logic ---
+  // Quiz State & Day 12
   let currentQuestionIndex = 0;
 
   function renderDay12View() {
     const container = document.getElementById("day12-container");
+    if (!container) return;
 
     if (appState.day12.daySubmitted) {
-      // Completed Celebration State
       container.innerHTML = `
         <div class="celebration-box card">
           <div class="celebration-icon">✓</div>
           <h2 class="celebration-title">DAY 12 COMPLETE 🎉</h2>
-          <p class="celebration-sub">Another day shipped. Your streak is now ${appState.stats.streak} days 🔥</p>
+          <p class="celebration-sub">Your streak continues. 12 days built 🔥</p>
           
           <div class="celebration-metrics">
             <div class="metric-row">
@@ -392,28 +407,26 @@
             </div>
             <div class="metric-row">
               <span class="metric-lbl">GitHub Proof</span>
-              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
+              <span class="metric-val" style="color: var(--success-color)">✓ Submitted</span>
             </div>
             <div class="metric-row">
               <span class="metric-lbl">LinkedIn Proof</span>
-              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
+              <span class="metric-val" style="color: var(--success-color)">✓ Submitted</span>
             </div>
           </div>
 
           <button class="btn-primary" id="btn-back-dash">Back to Dashboard</button>
         </div>
       `;
-      document.getElementById("btn-back-dash").addEventListener("click", () => navigateTo("/dashboard"));
+      document.getElementById("btn-back-dash")?.addEventListener("click", () => navigateTo("/dashboard"));
       return;
     }
 
-    // Active Challenge View
     const missionDone = appState.day12.missionCompleted;
     const testDone = appState.day12.testCompleted;
     const proofDone = !!(appState.day12.githubProof && appState.day12.linkedinProof);
 
     container.innerHTML = `
-      <!-- Stepper Progress Indicator -->
       <div class="stage-stepper">
         <div class="stage-step ${missionDone ? 'completed' : 'active'}">
           <div class="stage-dot">${missionDone ? '✓' : '1'}</div>
@@ -436,7 +449,6 @@
         </div>
       </div>
 
-      <!-- Mission Card -->
       <div class="card">
         <div class="mission-header">
           <div class="mission-tag">Day 12 Mission Brief</div>
@@ -445,30 +457,27 @@
         </div>
       </div>
 
-      <!-- Daily Test Section -->
       <div class="card" id="quiz-card">
         <div class="card-title">
           <span>Test your understanding</span>
-          <span class="badge">${testDone ? 'Complete ✓' : 'Required'}</span>
+          <span class="badge">${testDone ? 'Complete 🎉' : 'Required'}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">Complete this short test before submitting today's build.</p>
-
         <div id="quiz-body"></div>
       </div>
 
-      <!-- Proof Submission Section -->
       <div class="card">
         <div class="card-title">
           <span>Submit Proof & Complete Day</span>
         </div>
 
         <div class="input-group">
-          <label class="input-label">GitHub Repository Link</label>
+          <label class="input-label">GitHub Repository Proof</label>
           <input type="text" id="input-github" class="form-input" placeholder="https://github.com/username/day12-build" value="${appState.day12.githubProof || ''}">
         </div>
 
         <div class="input-group">
-          <label class="input-label">LinkedIn Post Link</label>
+          <label class="input-label">LinkedIn Post Proof</label>
           <input type="text" id="input-linkedin" class="form-input" placeholder="https://linkedin.com/posts/day12-challenge" value="${appState.day12.linkedinProof || ''}">
         </div>
 
@@ -478,7 +487,6 @@
       </div>
     `;
 
-    // Bind inputs
     const ghInput = document.getElementById("input-github");
     const liInput = document.getElementById("input-linkedin");
     const submitBtn = document.getElementById("btn-submit-day");
@@ -489,18 +497,16 @@
       saveState();
 
       if (appState.day12.testCompleted && appState.day12.githubProof && appState.day12.linkedinProof) {
-        submitBtn.removeAttribute("disabled");
+        submitBtn?.removeAttribute("disabled");
       } else {
-        submitBtn.setAttribute("disabled", "true");
+        submitBtn?.setAttribute("disabled", "true");
       }
     }
 
-    ghInput.addEventListener("input", validateProofs);
-    liInput.addEventListener("input", validateProofs);
+    ghInput?.addEventListener("input", validateProofs);
+    liInput?.addEventListener("input", validateProofs);
+    submitBtn?.addEventListener("click", submitDayAction);
 
-    submitBtn.addEventListener("click", submitDayAction);
-
-    // Render Quiz Body
     renderQuizBody();
   }
 
@@ -517,7 +523,7 @@
         </div>
         <button class="btn-secondary" id="btn-review-answers">Review Answers</button>
       `;
-      document.getElementById("btn-review-answers").addEventListener("click", showReviewAnswersModal);
+      document.getElementById("btn-review-answers")?.addEventListener("click", showReviewAnswersModal);
       return;
     }
 
@@ -548,37 +554,29 @@
       </div>
     `;
 
-    // Handle Option Selection
     quizBody.querySelectorAll(".quiz-option").forEach(opt => {
       opt.addEventListener("click", () => {
-        const letter = opt.dataset.letter;
-        appState.day12.userAnswers[q.id] = letter;
+        appState.day12.userAnswers[q.id] = opt.dataset.letter;
         saveState();
         renderQuizBody();
       });
     });
 
-    // Nav Buttons
-    const prevBtn = document.getElementById("btn-prev-q");
-    if (prevBtn && currentQuestionIndex > 0) {
-      prevBtn.addEventListener("click", () => {
+    document.getElementById("btn-prev-q")?.addEventListener("click", () => {
+      if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         renderQuizBody();
-      });
-    }
+      }
+    });
 
-    const nextBtn = document.getElementById("btn-next-q");
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
+    document.getElementById("btn-next-q")?.addEventListener("click", () => {
+      if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
         currentQuestionIndex++;
         renderQuizBody();
-      });
-    }
+      }
+    });
 
-    const submitTestBtn = document.getElementById("btn-submit-test");
-    if (submitTestBtn) {
-      submitTestBtn.addEventListener("click", submitTest);
-    }
+    document.getElementById("btn-submit-test")?.addEventListener("click", submitTest);
   }
 
   function submitTest() {
@@ -592,7 +590,6 @@
     appState.day12.testCompleted = true;
     appState.day12.testScore = score;
 
-    // Check perfect test achievement
     if (score === 5) {
       const perfAch = appState.achievements.find(a => a.id === "perfect");
       if (perfAch) perfAch.unlocked = true;
@@ -604,6 +601,8 @@
 
   function showReviewAnswersModal() {
     const drawer = document.getElementById("detail-modal");
+    if (!drawer) return;
+
     let reviewHtml = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
@@ -631,8 +630,8 @@
     `;
 
     drawer.innerHTML = reviewHtml;
-    document.getElementById("modal-overlay").classList.add("active");
-    document.getElementById("btn-close-review").addEventListener("click", closeModal);
+    document.getElementById("modal-overlay")?.classList.add("active");
+    document.getElementById("btn-close-review")?.addEventListener("click", closeModal);
   }
 
   function submitDayAction() {
@@ -643,9 +642,11 @@
     renderDay12View();
   }
 
-  // --- Profile & Settings Drawer ---
+  // Profile Drawer
   function openProfileDrawer() {
     const drawer = document.getElementById("detail-modal");
+    if (!drawer) return;
+
     drawer.innerHTML = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
@@ -682,49 +683,40 @@
       </div>
     `;
 
-    document.getElementById("modal-overlay").classList.add("active");
+    document.getElementById("modal-overlay")?.classList.add("active");
 
     drawer.querySelectorAll(".theme-opt-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         appState.theme = btn.dataset.themeVal;
         saveState();
         applyTheme(appState.theme);
-        openProfileDrawer(); // re-render drawer
+        openProfileDrawer();
       });
     });
 
-    document.getElementById("btn-close-profile").addEventListener("click", closeModal);
+    document.getElementById("btn-close-profile")?.addEventListener("click", closeModal);
   }
 
-  // --- Initialize App ---
+  // App Init
   document.addEventListener("DOMContentLoaded", () => {
-    // Apply initial theme
     applyTheme(appState.theme);
 
-    // Bind nav buttons
-    document.getElementById("nav-dashboard").addEventListener("click", (e) => {
+    document.getElementById("nav-dashboard")?.addEventListener("click", (e) => {
       e.preventDefault();
       navigateTo("/dashboard");
     });
-    document.getElementById("nav-day12").addEventListener("click", (e) => {
+    document.getElementById("nav-day12")?.addEventListener("click", (e) => {
       e.preventDefault();
       navigateTo("/day/12");
     });
 
-    // Bind brand logo
-    document.querySelector(".brand-logo").addEventListener("click", () => navigateTo("/dashboard"));
+    document.querySelector(".brand-logo")?.addEventListener("click", () => navigateTo("/dashboard"));
+    document.getElementById("btn-profile-trigger")?.addEventListener("click", openProfileDrawer);
 
-    // Profile trigger
-    document.getElementById("btn-profile-trigger").addEventListener("click", openProfileDrawer);
-
-    // Modal Overlay backdrop click
-    document.getElementById("modal-overlay").addEventListener("click", (e) => {
-      if (e.target.id === "modal-overlay") {
-        closeModal();
-      }
+    document.getElementById("modal-overlay")?.addEventListener("click", (e) => {
+      if (e.target.id === "modal-overlay") closeModal();
     });
 
-    // Initial render
     renderRoute(getNormalizedPath());
   });
 
