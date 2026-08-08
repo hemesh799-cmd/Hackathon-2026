@@ -3,20 +3,35 @@
 (function () {
   'use strict';
 
-  // --- Initial Default Mock State ---
+  // --- Starter Code Templates ---
+  const STARTER_CODES = {
+    python: `def find_largest(arr):\n    # Write your solution here\n    return max(arr)\n\n# Input parsing\nn = int(input())\narr = list(map(int, input().split()))\nprint(find_largest(arr))`,
+    cpp: `#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint findLargest(vector<int>& arr) {\n    int maxVal = arr[0];\n    for(int x : arr) {\n        if(x > maxVal) maxVal = x;\n    }\n    return maxVal;\n}\n\nint main() {\n    int n;\n    if(cin >> n) {\n        vector<int> arr(n);\n        for(int i = 0; i < n; i++) cin >> arr[i];\n        cout << findLargest(arr);\n    }\n    return 0;\n}`,
+    c: `#include <stdio.h>\n\nint findLargest(int arr[], int n) {\n    int max = arr[0];\n    for (int i = 1; i < n; i++) {\n        if (arr[i] > max) max = arr[i];\n    }\n    return max;\n}\n\nint main() {\n    int n;\n    if (scanf("%d", &n) == 1) {\n        int arr[n];\n        for (int i = 0; i < n; i++) scanf("%d", &arr[i]);\n        printf("%d", findLargest(arr, n));\n    }\n    return 0;\n}`,
+    java: `import java.util.Scanner;\n\npublic class Solution {\n    public static int findLargest(int[] arr) {\n        int max = arr[0];\n        for (int x : arr) {\n            if (x > max) max = x;\n        }\n        return max;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int[] arr = new int[n];\n            for (int i = 0; i < n; i++) arr[i] = sc.nextInt();\n            System.out.print(findLargest(arr));\n        }\n    }\n}`
+  };
+
+  // --- Initial Default State ---
   const DEFAULT_STATE = {
     user: {
       name: "Alex",
       role: "Frontend Developer",
       track: "Web Development"
     },
-    theme: "system", // "light" | "dark" | "system"
+    theme: "system",
     notifications: true,
     day12: {
       missionCompleted: true,
+      learnCompleted: true,
       testCompleted: false,
       testScore: null,
       userAnswers: {},
+      codeLanguage: "python",
+      codeContent: STARTER_CODES.python,
+      codeExecuted: false,
+      codePassed: false,
+      passedTestCount: 0,
+      totalTestCount: 3,
       githubProof: "",
       linkedinProof: "",
       daySubmitted: false
@@ -33,6 +48,13 @@
       avgScore: 86,
       buildsShipped: 10
     },
+    codingProgress: {
+      problemsSolved: 18,
+      mcqsCompleted: 42,
+      accuracy: 86,
+      codingStreak: 7,
+      progressPct: 75
+    },
     achievements: [
       { id: "first3", title: "First 3 Days", desc: "Started the chain", icon: "🔥", unlocked: true },
       { id: "streak7", title: "7 Day Streak", desc: "One week of consistency", icon: "⚡", unlocked: true },
@@ -43,10 +65,22 @@
     ]
   };
 
-  // --- Quiz Questions for Day 12 ---
+  // --- Quiz Questions ---
   const QUIZ_QUESTIONS = [
     {
       id: 1,
+      question: "Which data structure follows the LIFO (Last In First Out) principle?",
+      options: [
+        { letter: "A", text: "Queue" },
+        { letter: "B", text: "Stack" },
+        { letter: "C", text: "Array" },
+        { letter: "D", text: "Linked List" }
+      ],
+      correct: "B",
+      explanation: "A Stack adds and removes elements from the top (LIFO)."
+    },
+    {
+      id: 2,
       question: "Which CSS property is commonly used to create a responsive layout?",
       options: [
         { letter: "A", text: "position" },
@@ -55,10 +89,10 @@
         { letter: "D", text: "visibility" }
       ],
       correct: "B",
-      explanation: "The 'display' property (display: flex / display: grid) forms the core foundation of responsive CSS layouts."
+      explanation: "'display: flex' and 'display: grid' drive modern responsive design."
     },
     {
-      id: 2,
+      id: 3,
       question: "What HTML meta tag is required for proper mobile responsive rendering?",
       options: [
         { letter: "A", text: '<meta name="viewport" content="width=device-width, initial-scale=1.0">' },
@@ -67,10 +101,10 @@
         { letter: "D", text: '<meta name="zoom" content="disable">' }
       ],
       correct: "A",
-      explanation: "The viewport meta tag instructs browsers to scale page dimensions to fit the device screen width."
+      explanation: "The viewport meta tag scales content to device width."
     },
     {
-      id: 3,
+      id: 4,
       question: "In Flexbox, which property aligns items along the main axis?",
       options: [
         { letter: "A", text: "align-items" },
@@ -79,31 +113,19 @@
         { letter: "D", text: "flex-direction" }
       ],
       correct: "B",
-      explanation: "'justify-content' distributes flex items along the main axis."
-    },
-    {
-      id: 4,
-      question: "Which media query rule targets screen viewports with a max width of 480px?",
-      options: [
-        { letter: "A", text: "@media (min-width: 480px)" },
-        { letter: "B", text: "@media (max-width: 480px)" },
-        { letter: "C", text: "@media screen and (width: 480px)" },
-        { letter: "D", text: "@media mobile-only" }
-      ],
-      correct: "B",
-      explanation: "'(max-width: 480px)' matches screen sizes 480px wide or smaller."
+      explanation: "'justify-content' aligns flex items along the main axis."
     },
     {
       id: 5,
-      question: "Which CSS relative unit is based on the root font size, ideal for scalable UI?",
+      question: "Which relative CSS unit is based on the root font size?",
       options: [
         { letter: "A", text: "px" },
         { letter: "B", text: "rem" },
         { letter: "C", text: "pt" },
-        { letter: "D", text: "vh" },
+        { letter: "D", text: "vh" }
       ],
       correct: "B",
-      explanation: "'rem' scales proportionately to the root font size."
+      explanation: "'rem' scales relative to the root font size."
     }
   ];
 
@@ -188,16 +210,12 @@
     document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
 
     if (norm === "/day/12") {
-      const viewDay12 = document.getElementById("view-day12");
-      const navDay12 = document.getElementById("nav-day12");
-      if (viewDay12) viewDay12.classList.add("active");
-      if (navDay12) navDay12.classList.add("active");
+      document.getElementById("view-day12")?.classList.add("active");
+      document.getElementById("nav-day12")?.classList.add("active");
       renderDay12View();
     } else {
-      const viewDash = document.getElementById("view-dashboard");
-      const navDash = document.getElementById("nav-dashboard");
-      if (viewDash) viewDash.classList.add("active");
-      if (navDash) navDash.classList.add("active");
+      document.getElementById("view-dashboard")?.classList.add("active");
+      document.getElementById("nav-dashboard")?.classList.add("active");
       renderDashboardView();
     }
     window.scrollTo(0, 0);
@@ -206,8 +224,9 @@
   window.addEventListener("popstate", () => renderRoute(getNormalizedPath()));
   window.addEventListener("hashchange", () => renderRoute(getNormalizedPath()));
 
-  // Render Dashboard
+  // Render Dashboard View
   function renderDashboardView() {
+    // 1. Reminder
     const reminderCard = document.getElementById("dashboard-reminder");
     if (reminderCard) {
       if (appState.day12.daySubmitted) {
@@ -226,14 +245,51 @@
             <span class="reminder-icon">🔥</span>
             <span class="reminder-title">Today's build is waiting.</span>
           </div>
-          <p class="reminder-sub">Estimated time: 45 min • Mobile Layouts & Flexbox</p>
+          <p class="reminder-sub">Estimated time: 45 min • Mobile Layouts & Array Algorithms</p>
           <button class="btn-primary" id="btn-start-mission">Start today's mission →</button>
         `;
         document.getElementById("btn-start-mission")?.addEventListener("click", () => navigateTo("/day/12"));
       }
     }
 
-    // Build Chain
+    // 2. Coding Progress Card
+    const codingProgressContainer = document.getElementById("dashboard-coding-progress");
+    if (codingProgressContainer) {
+      const p = appState.codingProgress;
+      codingProgressContainer.innerHTML = `
+        <div class="card-title">
+          <span>CODING PROGRESS</span>
+          <span class="badge">Neo Colab Platform</span>
+        </div>
+        <div class="coding-progress-grid">
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.problemsSolved}</div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Problems Solved</div>
+          </div>
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.mcqsCompleted}</div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">MCQs Completed</div>
+          </div>
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.accuracy}%</div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Accuracy</div>
+          </div>
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.codingStreak} 🔥</div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Coding Streak</div>
+          </div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" style="width: ${p.progressPct}%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 6px; font-weight: 600;">
+          <span>Target Progress</span>
+          <span>${p.progressPct}%</span>
+        </div>
+      `;
+    }
+
+    // 3. Build Chain
     const chainContainer = document.getElementById("build-chain-grid");
     if (chainContainer) {
       chainContainer.innerHTML = "";
@@ -266,7 +322,7 @@
       }
     }
 
-    // Streak Recovery
+    // 4. Streak Recovery Banner
     const recoveryContainer = document.getElementById("recovery-banner-slot");
     if (recoveryContainer) {
       if (!appState.missedDay.isRecovered) {
@@ -274,7 +330,7 @@
         recoveryContainer.innerHTML = `
           <div class="recovery-banner">
             <div class="recovery-title">You missed yesterday.</div>
-            <div class="recovery-desc">Your journey isn't over. You have 1 streak recovery available.</div>
+            <div class="recovery-desc">Your journey isn't over. STREAK RECOVERY available (1 remaining).</div>
             <button class="recovery-btn" id="btn-recover-streak">Recover My Streak</button>
           </div>
         `;
@@ -289,7 +345,7 @@
       }
     }
 
-    // Stats
+    // 5. Stats Grid
     const statDays = document.getElementById("stat-days-built");
     const statStreak = document.getElementById("stat-streak");
     const statTests = document.getElementById("stat-tests");
@@ -302,7 +358,7 @@
     if (statAvg) statAvg.innerText = `${appState.stats.avgScore}%`;
     if (statBuilds) statBuilds.innerText = appState.stats.buildsShipped;
 
-    // Achievements
+    // 6. Achievements
     const achievementsContainer = document.getElementById("achievements-grid");
     if (achievementsContainer) {
       achievementsContainer.innerHTML = "";
@@ -347,8 +403,8 @@
       }
     } else if (dayNum === 12) {
       statusText = appState.day12.daySubmitted ? "✓ Completed" : "⚡ Current Active Day";
-      detailText = "Mobile Layouts & Flexbox";
-      scoreText = appState.day12.testScore !== null ? `Score: ${appState.day12.testScore}/5` : "Test Pending";
+      detailText = "Largest Array Element Challenge";
+      scoreText = appState.day12.testScore !== null ? `Score: ${appState.day12.testScore}/5` : "Pending";
     }
 
     const drawer = document.getElementById("detail-modal");
@@ -382,7 +438,7 @@
     document.getElementById("modal-overlay")?.classList.remove("active");
   }
 
-  // Quiz State & Day 12
+  // --- Day 12 Rendering ---
   let currentQuestionIndex = 0;
 
   function renderDay12View() {
@@ -402,8 +458,12 @@
               <span class="metric-val">${appState.stats.daysBuilt} Days</span>
             </div>
             <div class="metric-row">
-              <span class="metric-lbl">Test Score</span>
+              <span class="metric-lbl">MCQ Test Score</span>
               <span class="metric-val">${appState.day12.testScore} / 5</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-lbl">Coding Challenge</span>
+              <span class="metric-val" style="color: var(--success-color)">3 / 3 Passed ✓</span>
             </div>
             <div class="metric-row">
               <span class="metric-lbl">GitHub Proof</span>
@@ -423,49 +483,141 @@
     }
 
     const missionDone = appState.day12.missionCompleted;
+    const learnDone = appState.day12.learnCompleted;
     const testDone = appState.day12.testCompleted;
+    const codeDone = appState.day12.codePassed;
     const proofDone = !!(appState.day12.githubProof && appState.day12.linkedinProof);
 
     container.innerHTML = `
+      <!-- 6-Stage Progress Indicator Stepper -->
       <div class="stage-stepper">
         <div class="stage-step ${missionDone ? 'completed' : 'active'}">
           <div class="stage-dot">${missionDone ? '✓' : '1'}</div>
           <span>MISSION</span>
         </div>
         <div class="stage-line"></div>
-        <div class="stage-step ${testDone ? 'completed' : (missionDone ? 'active' : '')}">
-          <div class="stage-dot">${testDone ? '✓' : '2'}</div>
-          <span>TEST</span>
+        <div class="stage-step ${learnDone ? 'completed' : (missionDone ? 'active' : '')}">
+          <div class="stage-dot">${learnDone ? '✓' : '2'}</div>
+          <span>LEARN</span>
         </div>
         <div class="stage-line"></div>
-        <div class="stage-step ${proofDone ? 'completed' : (testDone ? 'active' : '')}">
-          <div class="stage-dot">${proofDone ? '✓' : '3'}</div>
+        <div class="stage-step ${testDone ? 'completed' : (learnDone ? 'active' : '')}">
+          <div class="stage-dot">${testDone ? '✓' : '3'}</div>
+          <span>MCQ</span>
+        </div>
+        <div class="stage-line"></div>
+        <div class="stage-step ${codeDone ? 'completed' : (testDone ? 'active' : '')}">
+          <div class="stage-dot">${codeDone ? '✓' : '4'}</div>
+          <span>CODE</span>
+        </div>
+        <div class="stage-line"></div>
+        <div class="stage-step ${proofDone ? 'completed' : (codeDone ? 'active' : '')}">
+          <div class="stage-dot">${proofDone ? '✓' : '5'}</div>
           <span>PROOF</span>
         </div>
         <div class="stage-line"></div>
         <div class="stage-step ${appState.day12.daySubmitted ? 'completed' : ''}">
-          <div class="stage-dot">4</div>
-          <span>COMPLETE</span>
+          <div class="stage-dot">6</div>
+          <span>SHIP</span>
         </div>
       </div>
 
+      <!-- Mission Brief -->
       <div class="card">
         <div class="mission-header">
-          <div class="mission-tag">Day 12 Mission Brief</div>
-          <h2 class="mission-title">Building Responsive Mobile Layouts</h2>
-          <p class="mission-desc">Master CSS Flexbox, mobile viewports, and custom breakpoints to craft pixel-perfect 390px mobile screens.</p>
+          <div class="mission-tag">Day 12 Mission</div>
+          <h2 class="mission-title">Mobile Layouts & Array Algorithms</h2>
+          <p class="mission-desc">Solve array optimization algorithms and build mobile responsive viewports.</p>
         </div>
       </div>
 
+      <!-- Quick MCQ Section -->
       <div class="card" id="quiz-card">
         <div class="card-title">
-          <span>Test your understanding</span>
-          <span class="badge">${testDone ? 'Complete 🎉' : 'Required'}</span>
+          <span>QUICK CHECK</span>
+          <span class="badge">${testDone ? 'Complete 🎉' : 'MCQ Test'}</span>
         </div>
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">Complete this short test before submitting today's build.</p>
         <div id="quiz-body"></div>
       </div>
 
+      <!-- Coding Challenge Section -->
+      <div class="card" id="coding-card">
+        <div class="card-title">
+          <span>Today's Coding Challenge</span>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">Easy • +50 XP</span>
+        </div>
+        
+        <div class="challenge-spec-box">
+          <div style="font-weight: 800; font-size: 14px; margin-bottom: 6px;">Find Largest Element in Array</div>
+          <p style="color: var(--text-secondary); margin-bottom: 8px;">Write a program to find the largest element in an array.</p>
+          
+          <div class="spec-title">Input Format:</div>
+          <div class="spec-code-block">First line contains integer N.\nSecond line contains N space-separated integers.</div>
+          
+          <div class="spec-title">Output Format:</div>
+          <div class="spec-code-block">Print single integer representing the maximum element.</div>
+
+          <div class="spec-title">Constraints:</div>
+          <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">1 <= N <= 10^5</div>
+        </div>
+
+        <div class="lang-selector-row">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Language:</span>
+          <div class="lang-tabs">
+            <button class="lang-tab ${appState.day12.codeLanguage === 'c' ? 'active' : ''}" data-lang="c">C</button>
+            <button class="lang-tab ${appState.day12.codeLanguage === 'cpp' ? 'active' : ''}" data-lang="cpp">C++</button>
+            <button class="lang-tab ${appState.day12.codeLanguage === 'java' ? 'active' : ''}" data-lang="java">Java</button>
+            <button class="lang-tab ${appState.day12.codeLanguage === 'python' ? 'active' : ''}" data-lang="python">Python</button>
+          </div>
+        </div>
+
+        <textarea id="code-editor" class="editor-textarea" spellcheck="false">${appState.day12.codeContent}</textarea>
+
+        <!-- Test Cases -->
+        <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Test Cases</div>
+        <div class="test-cases-box">
+          <div class="test-case-card">
+            <div class="test-case-header">
+              <span>Test Case 1</span>
+              <span id="tc-1-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
+                ${appState.day12.codeExecuted ? '✓ Passed' : '○ Pending'}
+              </span>
+            </div>
+            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Input: 5 \n 10 20 5 30 15</div>
+            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Expected Output: 30</div>
+          </div>
+
+          <div class="test-case-card">
+            <div class="test-case-header">
+              <span>Test Case 2</span>
+              <span id="tc-2-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
+                ${appState.day12.codeExecuted ? '✓ Passed' : '○ Pending'}
+              </span>
+            </div>
+            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Input: 4 \n 7 3 9 2</div>
+            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Expected Output: 9</div>
+          </div>
+
+          <div class="test-case-card">
+            <div class="test-case-header">
+              <span>Test Case 3 (Hidden)</span>
+              <span id="tc-3-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
+                ${appState.day12.codeExecuted ? '✓ Passed' : '○ Hidden'}
+              </span>
+            </div>
+            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Hidden evaluation case</div>
+          </div>
+        </div>
+
+        <div id="run-results-area" style="margin-bottom: 12px;"></div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" id="btn-run-code">Run Code</button>
+          <button class="btn-primary" id="btn-submit-code">Submit Code</button>
+        </div>
+      </div>
+
+      <!-- Proof Submission Section -->
       <div class="card">
         <div class="card-title">
           <span>Submit Proof & Complete Day</span>
@@ -481,12 +633,35 @@
           <input type="text" id="input-linkedin" class="form-input" placeholder="https://linkedin.com/posts/day12-challenge" value="${appState.day12.linkedinProof || ''}">
         </div>
 
-        <button class="btn-primary" id="btn-submit-day" ${!(testDone && appState.day12.githubProof && appState.day12.linkedinProof) ? 'disabled' : ''}>
+        <button class="btn-primary" id="btn-submit-day" ${!(testDone && codeDone && appState.day12.githubProof && appState.day12.linkedinProof) ? 'disabled' : ''}>
           Submit Day 12 →
         </button>
       </div>
     `;
 
+    // Language tabs event listener
+    container.querySelectorAll(".lang-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        const lang = tab.dataset.lang;
+        appState.day12.codeLanguage = lang;
+        appState.day12.codeContent = STARTER_CODES[lang];
+        saveState();
+        renderDay12View();
+      });
+    });
+
+    // Editor textarea event listener
+    const codeEditor = document.getElementById("code-editor");
+    codeEditor?.addEventListener("input", () => {
+      appState.day12.codeContent = codeEditor.value;
+      saveState();
+    });
+
+    // Run Code Action
+    document.getElementById("btn-run-code")?.addEventListener("click", runCodeRunner);
+    document.getElementById("btn-submit-code")?.addEventListener("click", submitCodeRunner);
+
+    // Proof Inputs
     const ghInput = document.getElementById("input-github");
     const liInput = document.getElementById("input-linkedin");
     const submitBtn = document.getElementById("btn-submit-day");
@@ -496,7 +671,7 @@
       appState.day12.linkedinProof = liInput.value.trim();
       saveState();
 
-      if (appState.day12.testCompleted && appState.day12.githubProof && appState.day12.linkedinProof) {
+      if (appState.day12.testCompleted && appState.day12.codePassed && appState.day12.githubProof && appState.day12.linkedinProof) {
         submitBtn?.removeAttribute("disabled");
       } else {
         submitBtn?.setAttribute("disabled", "true");
@@ -510,6 +685,81 @@
     renderQuizBody();
   }
 
+  function runCodeRunner() {
+    appState.day12.codeExecuted = true;
+    appState.day12.passedTestCount = 3;
+    saveState();
+
+    const resultsArea = document.getElementById("run-results-area");
+    if (resultsArea) {
+      resultsArea.innerHTML = `
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px;">
+          <div style="font-weight: 800; color: var(--success-color); margin-bottom: 4px;">Test Results: 3 / 3 Test Cases Passed</div>
+          <div style="font-size: 12px; color: var(--text-secondary);">✓ Test Case 1 Passed • ✓ Test Case 2 Passed • ✓ Test Case 3 Passed</div>
+          <div style="font-size: 11px; color: var(--accent-color); font-weight: 700; margin-top: 4px;">Execution Time: 42 ms</div>
+        </div>
+      `;
+    }
+
+    document.getElementById("tc-1-status").className = "test-status passed";
+    document.getElementById("tc-1-status").innerText = "✓ Passed";
+    document.getElementById("tc-2-status").className = "test-status passed";
+    document.getElementById("tc-2-status").innerText = "✓ Passed";
+    document.getElementById("tc-3-status").className = "test-status passed";
+    document.getElementById("tc-3-status").innerText = "✓ Passed";
+  }
+
+  function submitCodeRunner() {
+    runCodeRunner();
+    appState.day12.codePassed = true;
+    appState.codingProgress.problemsSolved = 19;
+    saveState();
+
+    // Show Coding Result Screen Dialog
+    const drawer = document.getElementById("detail-modal");
+    if (drawer) {
+      drawer.innerHTML = `
+        <div class="drawer-content" style="text-align: center;">
+          <div class="drawer-handle"></div>
+          <div style="font-size: 40px; margin-bottom: 8px;">🎉</div>
+          <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">CODE SUBMITTED</h2>
+          <div style="font-size: 15px; font-weight: 700; color: var(--success-color); margin-bottom: 16px;">3 / 3 TESTS PASSED</div>
+          
+          <div class="celebration-metrics">
+            <div class="metric-row">
+              <span class="metric-lbl">Runtime</span>
+              <span class="metric-val">42 ms</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-lbl">Accuracy</span>
+              <span class="metric-val" style="color: var(--success-color)">100%</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-lbl">Difficulty</span>
+              <span class="metric-val">Easy</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-lbl">Reward</span>
+              <span class="metric-val" style="color: var(--accent-color)">+50 XP</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-lbl">Streak</span>
+              <span class="metric-val">🔥 Maintained</span>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-continue-day">Continue Day →</button>
+        </div>
+      `;
+      document.getElementById("modal-overlay")?.classList.add("active");
+      document.getElementById("btn-continue-day")?.addEventListener("click", () => {
+        closeModal();
+        renderDay12View();
+      });
+    }
+  }
+
+  // Quiz Renderer
   function renderQuizBody() {
     const quizBody = document.getElementById("quiz-body");
     if (!quizBody) return;
@@ -517,9 +767,9 @@
     if (appState.day12.testCompleted) {
       quizBody.innerHTML = `
         <div style="background: var(--accent-light); border: 1px solid rgba(255, 90, 54, 0.3); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px;">
-          <div style="font-size: 16px; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">Test complete 🎉</div>
-          <div style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${appState.day12.testScore} / 5 correct</div>
-          <p style="font-size: 12px; color: var(--text-secondary);">Great work. You are ready to submit today's build.</p>
+          <div style="font-size: 16px; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">🎉 Test Complete</div>
+          <div style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">${appState.day12.testScore} / 5 Correct</div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--success-color); margin-bottom: 4px;">80% Accuracy • ✓ Strong understanding</div>
         </div>
         <button class="btn-secondary" id="btn-review-answers">Review Answers</button>
       `;
@@ -589,6 +839,7 @@
 
     appState.day12.testCompleted = true;
     appState.day12.testScore = score;
+    appState.codingProgress.mcqsCompleted = 43;
 
     if (score === 5) {
       const perfAch = appState.achievements.find(a => a.id === "perfect");
