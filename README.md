@@ -20,7 +20,7 @@ ABTalks is a mobile-first student product for the 60-Day Coding Challenge. Stude
 - **State Management**: Local persistent state powered by `localStorage` (`abtalks_state_v2`)
 - **Routing**: Lightweight client-side hash & path router supporting dynamic routes (`/`, `/dashboard`, `/day/12`)
 - **Backend / DB**: None required — lightweight, fast, self-contained mock evaluation & persistent storage
-- **Deployment**: GitHub Pages (`gh-pages` branch) & static web servers
+- **Deployment**: vercel
 
 ---
 
