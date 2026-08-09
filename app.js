@@ -1,4 +1,4 @@
-/* ABTalks 60-Day Coding Challenge Core Logic — v2 Polished */
+/* ABTalks 60-Day Coding Challenge Core Logic — v3 Complete */
 
 (function () {
   'use strict';
@@ -14,7 +14,8 @@
   // --- Initial Default State ---
   const DEFAULT_STATE = {
     user: {
-      name: "Alex",
+      name: "",
+      profileCompleted: false,
       role: "Frontend Developer",
       track: "Web Development"
     },
@@ -25,6 +26,10 @@
       learnCompleted: true,
       testCompleted: false,
       testScore: null,
+      testPercentage: null,
+      testCorrect: 0,
+      testWrong: 0,
+      testNotAttempted: 5,
       userAnswers: {},
       quizFeedbackShown: {},
       codeLanguage: "python",
@@ -71,7 +76,7 @@
     ]
   };
 
-  // --- Quiz Questions (5 Daily Test Questions) ---
+  // --- Quiz Questions with Predefined Correct Answers ---
   const QUIZ_QUESTIONS = [
     {
       id: 1,
@@ -82,6 +87,7 @@
         { letter: "C", text: "float-only" },
         { letter: "D", text: "visibility" }
       ],
+      correctAnswer: "B",
       correct: "B",
       explanation: "The 'display' property (using flex or grid) is the primary modern CSS tool for responsive layouts."
     },
@@ -94,6 +100,7 @@
         { letter: "C", text: "Grid has faster loading performance" },
         { letter: "D", text: "Flexbox cannot align items vertically" }
       ],
+      correctAnswer: "B",
       correct: "B",
       explanation: "CSS Grid manages rows and columns simultaneously (2D), whereas Flexbox works along a single axis (1D)."
     },
@@ -106,6 +113,7 @@
         { letter: "C", text: "O(N)" },
         { letter: "D", text: "O(N²)" }
       ],
+      correctAnswer: "C",
       correct: "C",
       explanation: "You must inspect each array element once, resulting in linear O(N) time complexity."
     },
@@ -118,6 +126,7 @@
         { letter: "C", text: "resolution" },
         { letter: "D", text: "device-aspect" }
       ],
+      correctAnswer: "B",
       correct: "B",
       explanation: "'max-width' allows targeting viewports up to a specific pixel width (e.g. max-width: 390px)."
     },
@@ -130,6 +139,7 @@
         { letter: "C", text: "rem" },
         { letter: "D", text: "vh" }
       ],
+      correctAnswer: "C",
       correct: "C",
       explanation: "'rem' (root em) scales relative to the font size set on the root <html> element."
     }
@@ -226,10 +236,59 @@
   window.addEventListener("popstate", () => renderRoute(getNormalizedPath()));
   window.addEventListener("hashchange", () => renderRoute(getNormalizedPath()));
 
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
   // =============================================================
-  // DASHBOARD RENDER
+  // DASHBOARD RENDER (Personalized Greeting & Complete Profile)
   // =============================================================
   function renderDashboardView() {
+    const userName = (appState.user.name || "").trim();
+    const greetingText = userName ? `Hi, ${escapeHtml(userName)} 👋` : "Hi there 👋";
+
+    // 0. Personalized Header Greeting
+    const greetingEl = document.getElementById("dashboard-user-greeting");
+    if (greetingEl) {
+      greetingEl.innerHTML = `
+        <div class="user-greeting-title">${greetingText}</div>
+        <div class="user-greeting-sub">Track your 60-day challenge progress & daily builds.</div>
+      `;
+    }
+
+    // 0b. Profile Prompt / Complete Profile Card
+    const profileCardEl = document.getElementById("dashboard-profile-card");
+    if (profileCardEl) {
+      if (appState.user.profileCompleted && userName) {
+        profileCardEl.innerHTML = `
+          <div class="card profile-prompt-card">
+            <div class="card-title">
+              <span>Profile Complete ✓</span>
+              <span class="badge" style="background: var(--success-bg); color: var(--success-color);">${escapeHtml(userName)}</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Track: ${escapeHtml(appState.user.track)} • Role: ${escapeHtml(appState.user.role)}</p>
+            <button class="btn-secondary" id="btn-edit-profile-dash">Edit Profile</button>
+          </div>
+        `;
+        document.getElementById("btn-edit-profile-dash")?.addEventListener("click", openProfileDrawer);
+      } else {
+        profileCardEl.innerHTML = `
+          <div class="card profile-prompt-card">
+            <div class="card-title">
+              <span>Complete your profile</span>
+              <span class="badge">Action Required</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Add your name and personalize your ABTalks experience.</p>
+            <button class="btn-primary" id="btn-complete-profile-dash">Complete Profile →</button>
+          </div>
+        `;
+        document.getElementById("btn-complete-profile-dash")?.addEventListener("click", openProfileDrawer);
+      }
+    }
+
     // 1. Reminder / Today's Challenge Banner (Feature 8)
     const reminderCard = document.getElementById("dashboard-reminder");
     if (reminderCard) {
@@ -398,11 +457,13 @@
     const statStreak = document.getElementById("stat-streak");
     const statTests = document.getElementById("stat-tests");
     const statAvg = document.getElementById("stat-avg-score");
+    const statLatest = document.getElementById("stat-latest-test");
     const statBuilds = document.getElementById("stat-builds-shipped");
     if (statDays) statDays.innerText = `${appState.stats.daysBuilt} / 60`;
     if (statStreak) statStreak.innerText = `${appState.stats.streak} days`;
     if (statTests) statTests.innerText = appState.stats.testsCompleted;
     if (statAvg) statAvg.innerText = `${appState.stats.avgScore}%`;
+    if (statLatest) statLatest.innerText = appState.day12.testScore !== null ? `${appState.day12.testScore} / 5 (${appState.day12.testPercentage}%)` : "Not taken";
     if (statBuilds) statBuilds.innerText = appState.stats.buildsShipped;
 
     // 8. Recent Activity
@@ -520,12 +581,12 @@
           <div class="celebration-icon">✓</div>
           <h2 class="celebration-title">DAY 12 COMPLETE 🎉</h2>
           <p class="celebration-sub" style="margin-bottom: 4px; font-weight: 600;">Another day shipped.</p>
-          <p class="celebration-sub" style="color: var(--accent-color); font-weight: 700; margin-bottom: 16px;">Your streak is now ${appState.stats.streak} days 🔥 • 12 days built</p>
+          <p class="celebration-sub" style="color: var(--accent-color); font-weight: 700; margin-bottom: 16px;">Streak: ${appState.stats.streak} days 🔥 • 12 days built</p>
           
           <div class="celebration-metrics">
             <div class="metric-row">
               <span class="metric-lbl">Test score:</span>
-              <span class="metric-val">${appState.day12.testScore} / 5</span>
+              <span class="metric-val">${appState.day12.testScore} / 5 (${appState.day12.testPercentage}%)</span>
             </div>
             <div class="metric-row">
               <span class="metric-lbl">Build:</span>
@@ -533,11 +594,11 @@
             </div>
             <div class="metric-row">
               <span class="metric-lbl">GitHub proof:</span>
-              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
+              <span class="metric-val" style="color: var(--success-color)">✓ Submitted</span>
             </div>
             <div class="metric-row">
               <span class="metric-lbl">LinkedIn proof:</span>
-              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
+              <span class="metric-val" style="color: var(--success-color)">✓ Submitted</span>
             </div>
           </div>
           <button class="btn-primary" id="btn-back-dash">Back to Dashboard</button>
@@ -590,7 +651,7 @@
         </div>
       </div>
 
-      <!-- Daily Coding Test Section (Feature 1) -->
+      <!-- Daily Coding Test Section (Part 1 - 5) -->
       <div class="card" id="quiz-card">
         <div class="card-title">
           <span>Test your understanding</span>
@@ -714,7 +775,7 @@
         </div>
       </div>
 
-      <!-- Build Submission Flow Section (Feature 2) -->
+      <!-- Build Submission Flow Section -->
       <div class="card" id="proof-card">
         <div class="card-title">
           <span>Build Submission Flow</span>
@@ -766,13 +827,6 @@
     const passed = appState.day12.passedTestCount;
     if (tcNum <= passed) return "✓ Passed";
     return "✗ Failed";
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
   }
 
   function wireDay12Events() {
@@ -1063,22 +1117,51 @@
   }
 
   // =============================================================
-  // QUIZ RENDERER (Feature 1: Daily Coding Test)
+  // QUIZ EVALUATION ENGINE & RENDERER (Parts 1 - 5)
   // =============================================================
+  function evaluateQuestion(q, rawUserAnswer) {
+    if (rawUserAnswer === undefined || rawUserAnswer === null) {
+      return { status: "NOT_ATTEMPTED", label: "Not Attempted", mark: 0 };
+    }
+    const trimmed = String(rawUserAnswer).trim();
+    if (trimmed === "") {
+      return { status: "NOT_ATTEMPTED", label: "Not Attempted", mark: 0 };
+    }
+    const expected = (q.correctAnswer || q.correct).trim().toUpperCase();
+    const actual = trimmed.toUpperCase();
+
+    if (actual === expected) {
+      return { status: "CORRECT", label: "Correct ✓", mark: 1 };
+    } else {
+      return { status: "WRONG", label: "Wrong ✗", mark: 0 };
+    }
+  }
+
   function renderQuizBody() {
     const quizBody = document.getElementById("quiz-body");
     if (!quizBody) return;
 
     if (appState.day12.testCompleted) {
-      const score = appState.day12.testScore;
+      const score = appState.day12.testScore !== null ? appState.day12.testScore : 0;
+      const pct = appState.day12.testPercentage !== null ? appState.day12.testPercentage : 0;
+      const correct = appState.day12.testCorrect || 0;
+      const wrong = appState.day12.testWrong || 0;
+      const notAttempted = appState.day12.testNotAttempted || 0;
+
       quizBody.innerHTML = `
         <div class="quiz-complete-box">
           <div class="quiz-complete-icon">🎉</div>
-          <div class="quiz-complete-title">Test complete 🎉</div>
-          <div class="quiz-complete-score">${score} / 5 correct</div>
-          <div class="quiz-complete-accuracy" style="margin-top: 6px;">Great work. You are ready to submit today's build.</div>
+          <div class="quiz-complete-title" style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">TEST COMPLETE 🎉</div>
+          <div class="quiz-complete-score" style="font-size: 22px; font-weight: 800; color: var(--accent-color);">Score: ${score} / 5</div>
+          <div class="quiz-complete-percentage" style="font-size: 15px; font-weight: 700; color: var(--text-secondary); margin-top: 2px;">Percentage: ${pct}%</div>
+          
+          <div style="display: flex; justify-content: center; gap: 10px; font-size: 12px; font-weight: 700; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); flex-wrap: wrap;">
+            <span style="color: var(--success-color);">Correct: ${correct}</span>
+            <span style="color: var(--missed-color);">Wrong: ${wrong}</span>
+            <span style="color: var(--text-secondary);">Not Attempted: ${notAttempted}</span>
+          </div>
         </div>
-        <button class="btn-secondary" id="btn-review-answers">Review Answers</button>
+        <button class="btn-secondary" id="btn-review-answers" style="margin-top: 10px;">Review Question Results</button>
       `;
       document.getElementById("btn-review-answers")?.addEventListener("click", showReviewAnswersModal);
       return;
@@ -1086,14 +1169,13 @@
 
     const q = QUIZ_QUESTIONS[currentQuestionIndex];
     const selectedAns = appState.day12.userAnswers[q.id];
-    const feedbackShown = appState.day12.quizFeedbackShown[q.id];
 
     // Progress dots
     const progressDots = QUIZ_QUESTIONS.map((_, i) => {
       const ans = appState.day12.userAnswers[QUIZ_QUESTIONS[i].id];
       let cls = "q-dot";
       if (i === currentQuestionIndex) cls += " q-dot-active";
-      else if (ans) cls += " q-dot-answered";
+      else if (ans !== undefined && ans !== null && String(ans).trim() !== "") cls += " q-dot-answered";
       return `<div class="${cls}"></div>`;
     }).join('');
 
@@ -1107,43 +1189,36 @@
 
       <div class="quiz-options">
         ${q.options.map(opt => {
-          let optClass = "quiz-option";
-          if (feedbackShown) {
-            if (opt.letter === q.correct) optClass += " correct-answer";
-            else if (opt.letter === selectedAns && opt.letter !== q.correct) optClass += " wrong-answer";
-            else optClass += " dimmed-option";
-          } else if (selectedAns === opt.letter) {
-            optClass += " selected";
-          }
+          const isSelected = selectedAns === opt.letter;
           return `
-            <div class="${optClass}" data-letter="${opt.letter}" ${feedbackShown ? 'style="pointer-events:none;"' : ''}>
+            <div class="quiz-option ${isSelected ? 'selected' : ''}" data-letter="${opt.letter}">
               <div class="quiz-opt-letter">${opt.letter}</div>
               <div>${opt.text}</div>
-              ${feedbackShown && opt.letter === q.correct ? '<span class="ans-feedback correct">✓ Correct</span>' : ''}
-              ${feedbackShown && opt.letter === selectedAns && opt.letter !== q.correct ? '<span class="ans-feedback wrong">✗ Wrong</span>' : ''}
             </div>
           `;
         }).join('')}
       </div>
 
-      ${feedbackShown ? `<div class="quiz-explanation"><span>💡</span> ${q.explanation}</div>` : ''}
-
       <div class="quiz-nav-row">
         <button class="btn-secondary" id="btn-prev-q" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Previous</button>
         ${currentQuestionIndex === QUIZ_QUESTIONS.length - 1
-          ? `<button class="btn-primary" id="btn-submit-test" ${!selectedAns ? 'disabled' : ''}>Submit Test</button>`
-          : `<button class="btn-primary" id="btn-next-q" ${!selectedAns && !feedbackShown ? 'disabled' : ''}>Next</button>`
+          ? `<button class="btn-primary" id="btn-submit-test">Submit Test</button>`
+          : `<button class="btn-primary" id="btn-next-q">Next</button>`
         }
       </div>
     `;
 
-    // Option click handler
+    // Option selection & unselection handler (Part 2, Test Cases 5 & 6)
     quizBody.querySelectorAll(".quiz-option").forEach(opt => {
       opt.addEventListener("click", () => {
-        if (feedbackShown) return;
-        appState.day12.userAnswers[q.id] = opt.dataset.letter;
-        saveState();
-        appState.day12.quizFeedbackShown[q.id] = true;
+        const letter = opt.dataset.letter;
+        if (appState.day12.userAnswers[q.id] === letter) {
+          // Unselect / clear answer
+          delete appState.day12.userAnswers[q.id];
+        } else {
+          // Select or change answer
+          appState.day12.userAnswers[q.id] = letter;
+        }
         saveState();
         renderQuizBody();
       });
@@ -1164,21 +1239,40 @@
   }
 
   function submitTest() {
-    let score = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let notAttemptedCount = 0;
+
     QUIZ_QUESTIONS.forEach(q => {
-      if (appState.day12.userAnswers[q.id] === q.correct) score++;
+      const userAns = appState.day12.userAnswers[q.id];
+      const ev = evaluateQuestion(q, userAns);
+      if (ev.status === "CORRECT") correctCount++;
+      else if (ev.status === "WRONG") wrongCount++;
+      else notAttemptedCount++;
     });
+
+    const score = correctCount;
+    const percentage = Math.round((correctCount / QUIZ_QUESTIONS.length) * 100);
+
     appState.day12.testCompleted = true;
     appState.day12.testScore = score;
+    appState.day12.testPercentage = percentage;
+    appState.day12.testCorrect = correctCount;
+    appState.day12.testWrong = wrongCount;
+    appState.day12.testNotAttempted = notAttemptedCount;
+
     appState.stats.testsCompleted += 1;
-    const accuracy = Math.round((appState.codingProgress.mcqsCompleted + score) / (appState.stats.testsCompleted * 5) * 100);
-    appState.codingProgress.mcqsCompleted = appState.codingProgress.mcqsCompleted + score;
-    appState.stats.avgScore = Math.min(100, accuracy || 86);
+    const totalMcqs = (appState.codingProgress.mcqsCompleted || 40) + correctCount;
+    appState.codingProgress.mcqsCompleted = totalMcqs;
+
+    const prevPct = appState.stats.avgScore * (appState.stats.testsCompleted - 1);
+    appState.stats.avgScore = Math.min(100, Math.max(0, Math.round((prevPct + percentage) / appState.stats.testsCompleted)));
 
     if (score === 5) {
       const perfAch = appState.achievements.find(a => a.id === "perfect");
       if (perfAch) perfAch.unlocked = true;
     }
+
     saveState();
     renderDay12View();
   }
@@ -1187,35 +1281,58 @@
     const drawer = document.getElementById("detail-modal");
     if (!drawer) return;
 
+    const correctCount = appState.day12.testCorrect || 0;
+    const wrongCount = appState.day12.testWrong || 0;
+    const notAttemptedCount = appState.day12.testNotAttempted || 0;
+    const score = appState.day12.testScore !== null ? appState.day12.testScore : 0;
+    const pct = appState.day12.testPercentage !== null ? appState.day12.testPercentage : 0;
+
     let reviewHtml = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
-        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Review Answers</h3>
-        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Test Score: ${appState.day12.testScore} / 5 • ${Math.round((appState.day12.testScore / 5) * 100)}% Accuracy</div>
+        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px;">Question Results Review</h3>
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Score: <strong>${score} / 5</strong> (${pct}%) • Correct: ${correctCount} | Wrong: ${wrongCount} | Not Attempted: ${notAttemptedCount}
+        </div>
     `;
 
     QUIZ_QUESTIONS.forEach(q => {
       const userAns = appState.day12.userAnswers[q.id];
-      const isCorrect = userAns === q.correct;
-      const userOptText = q.options.find(o => o.letter === userAns)?.text || "Not answered";
-      const correctOptText = q.options.find(o => o.letter === q.correct)?.text || "";
+      const ev = evaluateQuestion(q, userAns);
+      const userOpt = q.options.find(o => o.letter === userAns);
+      const userOptText = userOpt ? `${userOpt.letter}. ${userOpt.text}` : "Not answered";
+      const correctOpt = q.options.find(o => o.letter === (q.correctAnswer || q.correct));
+      const correctOptText = correctOpt ? `${correctOpt.letter}. ${correctOpt.text}` : (q.correctAnswer || q.correct);
+
+      let statusClass = "review-unattempted";
+      let badgeClass = "not_attempted";
+      if (ev.status === "CORRECT") { statusClass = "review-correct"; badgeClass = "correct"; }
+      else if (ev.status === "WRONG") { statusClass = "review-wrong"; badgeClass = "wrong"; }
 
       reviewHtml += `
-        <div class="review-item ${isCorrect ? 'review-correct' : 'review-wrong'}">
+        <div class="review-item ${statusClass}">
           <div class="review-header">
-            <span>Q${q.id}</span>
-            <span class="review-verdict">${isCorrect ? '✓ Correct' : '✗ Incorrect'}</span>
+            <span>Question ${q.id}</span>
+            <span class="review-status-badge ${badgeClass}">${ev.label}</span>
           </div>
           <div class="review-question">${q.question}</div>
           <div class="review-answer">
             <div class="review-ans-row">
               <span class="review-lbl">Your answer:</span>
-              <span class="${isCorrect ? 'ans-correct-text' : 'ans-wrong-text'}">${userAns ? `${userAns}. ${userOptText}` : 'Not answered'}</span>
+              <span class="${ev.status === 'CORRECT' ? 'ans-correct-text' : (ev.status === 'WRONG' ? 'ans-wrong-text' : '')}">${userOptText}</span>
             </div>
-            ${!isCorrect ? `<div class="review-ans-row">
+            <div class="review-ans-row">
               <span class="review-lbl">Correct answer:</span>
-              <span class="ans-correct-text">${q.correct}. ${correctOptText}</span>
-            </div>` : ''}
+              <span class="ans-correct-text">${correctOptText}</span>
+            </div>
+            <div class="review-ans-row">
+              <span class="review-lbl">Status:</span>
+              <span class="review-val" style="font-weight: 700;">${ev.label}</span>
+            </div>
+            <div class="review-ans-row">
+              <span class="review-lbl">Marks:</span>
+              <span class="review-val" style="font-weight: 700;">${ev.mark}/1</span>
+            </div>
           </div>
           <div class="review-explanation">💡 ${q.explanation}</div>
         </div>
@@ -1251,28 +1368,45 @@
   }
 
   // =============================================================
-  // PROFILE / SETTINGS DRAWER (Feature 10)
+  // PROFILE / SETTINGS DRAWER (Parts 6 - 9 & Part 10)
   // =============================================================
   function openProfileDrawer() {
     const drawer = document.getElementById("detail-modal");
     if (!drawer) return;
 
+    const currentName = (appState.user.name || "").trim();
+    const isCompleted = appState.user.profileCompleted && currentName !== "";
+
     drawer.innerHTML = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
+        
         <div class="profile-avatar-row">
-          <div class="avatar-circle">${appState.user.name.charAt(0)}</div>
+          <div class="avatar-circle">${currentName ? currentName.charAt(0).toUpperCase() : 'A'}</div>
           <div>
-            <div class="profile-name">${appState.user.name}</div>
-            <div class="profile-role">${appState.user.role}</div>
-            <div style="font-size: 12px; color: var(--accent-color); font-weight: 700;">Current track: ${appState.user.track}</div>
+            <div class="profile-name">${currentName ? escapeHtml(currentName) : 'Student'}</div>
+            <div class="profile-role">${escapeHtml(appState.user.role)}</div>
+            <div style="font-size: 12px; color: var(--accent-color); font-weight: 700;">Track: ${escapeHtml(appState.user.track)}</div>
           </div>
+        </div>
+
+        <!-- Name Editing Form (Parts 6 & 7) -->
+        <div class="card" style="margin-bottom: 16px;">
+          <div class="card-title" style="margin-bottom: 8px;">
+            <span>${isCompleted ? 'Edit Profile' : 'Complete Your Profile'}</span>
+          </div>
+          <div class="input-group">
+            <label class="input-label">What's your name?</label>
+            <input type="text" id="profile-name-input" class="form-input" placeholder="Enter your name" value="${escapeHtml(currentName)}">
+            <div id="profile-name-error" style="color: var(--missed-color); font-size: 12px; font-weight: 700; margin-top: 4px; display: none;"></div>
+          </div>
+          <button class="btn-primary" id="btn-save-profile-action" style="margin-top: 10px; min-height: 44px;">Save Profile</button>
         </div>
 
         <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 8px;">
           <div>
             <div style="font-size: 16px; font-weight: 800; color: var(--accent-color);">${appState.stats.daysBuilt} / 60</div>
-            <div style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">DAYS BUILT</div>
+            <div style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">PROGRESS</div>
           </div>
           <div>
             <div style="font-size: 16px; font-weight: 800; color: var(--accent-color);">${appState.stats.streak}</div>
@@ -1302,16 +1436,32 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">RESET STATE</label>
-          <button class="btn-secondary" id="btn-reset-progress" style="margin-top: 8px; color: var(--missed-color); border-color: var(--missed-color); min-height: 44px;">Reset All Progress</button>
-        </div>
-
         <button class="btn-secondary" id="btn-close-profile">Close</button>
       </div>
     `;
 
     document.getElementById("modal-overlay")?.classList.add("active");
+
+    // Profile Save Action (Parts 6 & 7 & Test Case 8)
+    document.getElementById("btn-save-profile-action")?.addEventListener("click", () => {
+      const inputVal = document.getElementById("profile-name-input")?.value || "";
+      const trimmed = inputVal.trim();
+      const errEl = document.getElementById("profile-name-error");
+
+      if (!trimmed) {
+        if (errEl) {
+          errEl.textContent = "Please enter your name.";
+          errEl.style.display = "block";
+        }
+        return;
+      }
+
+      appState.user.name = trimmed;
+      appState.user.profileCompleted = true;
+      saveState();
+      closeModal();
+      renderRoute(getNormalizedPath());
+    });
 
     drawer.querySelectorAll(".theme-opt-btn[data-theme-val]").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1329,14 +1479,6 @@
     });
 
     document.getElementById("btn-close-profile")?.addEventListener("click", closeModal);
-    document.getElementById("btn-reset-progress")?.addEventListener("click", () => {
-      if (confirm("Reset all progress? This cannot be undone.")) {
-        localStorage.removeItem("abtalks_state_v2");
-        appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
-        closeModal();
-        renderRoute(getNormalizedPath());
-      }
-    });
   }
 
   // =============================================================

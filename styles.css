@@ -1536,6 +1536,7 @@ body {
 
 .review-item.review-correct { border-color: rgba(16,185,129,0.35); }
 .review-item.review-wrong { border-color: rgba(239,68,68,0.35); }
+.review-item.review-unattempted { border-color: var(--border-color); opacity: 0.9; }
 
 .review-header {
   display: flex;
@@ -1546,6 +1547,11 @@ body {
   font-weight: 700;
   color: var(--text-secondary);
 }
+
+.review-status-badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
+.review-status-badge.correct { color: var(--success-color); background: var(--success-bg); }
+.review-status-badge.wrong { color: var(--missed-color); background: var(--missed-bg); }
+.review-status-badge.not_attempted { color: var(--text-secondary); background: rgba(150,150,150,0.12); }
 
 .review-verdict { font-size: 11px; font-weight: 700; }
 .review-item.review-correct .review-verdict { color: var(--success-color); }
@@ -1591,4 +1597,27 @@ body {
   padding-top: 6px;
   border-top: 1px solid var(--border-color);
 }
+
+/* --- Personalized User Greeting --- */
+.dashboard-user-greeting {
+  padding: 4px 0 2px 0;
+  margin-bottom: -4px;
+}
+
+.user-greeting-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+}
+
+.user-greeting-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+
 
