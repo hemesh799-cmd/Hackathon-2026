@@ -1,15 +1,7 @@
-/* ABTalks 60-Day Coding Challenge Core Logic — v3 Complete */
+/* ABTalks 60-Day Coding Challenge Core Logic — v4 MCQ-Only */
 
 (function () {
   'use strict';
-
-  // --- Starter Code Templates ---
-  const STARTER_CODES = {
-    python: `def solve():\n    # Write your solution here\n    n = int(input())\n    arr = list(map(int, input().split()))\n    print(max(arr))\n\nsolve()`,
-    cpp: `#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint findLargest(vector<int>& arr) {\n    int maxVal = arr[0];\n    for(int x : arr) if(x > maxVal) maxVal = x;\n    return maxVal;\n}\n\nint main() {\n    int n;\n    if(cin >> n) {\n        vector<int> arr(n);\n        for(int i = 0; i < n; i++) cin >> arr[i];\n        cout << findLargest(arr);\n    }\n    return 0;\n}`,
-    c: `#include <stdio.h>\n\nint findLargest(int arr[], int n) {\n    int max = arr[0];\n    for (int i = 1; i < n; i++) if (arr[i] > max) max = arr[i];\n    return max;\n}\n\nint main() {\n    int n;\n    if (scanf("%d", &n) == 1) {\n        int arr[n];\n        for (int i = 0; i < n; i++) scanf("%d", &arr[i]);\n        printf("%d", findLargest(arr, n));\n    }\n    return 0;\n}`,
-    java: `import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int max = Integer.MIN_VALUE;\n            for (int i = 0; i < n; i++) {\n                int val = sc.nextInt();\n                if (val > max) max = val;\n            }\n            System.out.print(max);\n        }\n    }\n}`
-  };
 
   // --- Initial Default State ---
   const DEFAULT_STATE = {
@@ -29,15 +21,8 @@
       testPercentage: null,
       testCorrect: 0,
       testWrong: 0,
-      testNotAttempted: 5,
+      testNotAttempted: 10,
       userAnswers: {},
-      quizFeedbackShown: {},
-      codeLanguage: "python",
-      codeContent: STARTER_CODES.python,
-      codeExecuted: false,
-      codePassed: false,
-      passedTestCount: 0,
-      totalTestCount: 3,
       githubProof: "",
       linkedinProof: "",
       daySubmitted: false
@@ -54,16 +39,14 @@
       avgScore: 86,
       buildsShipped: 10
     },
-    codingProgress: {
-      problemsSolved: 18,
+    learningProgress: {
       mcqsCompleted: 42,
       accuracy: 86,
-      codingStreak: 7,
       progressPct: 75
     },
     recentActivity: [
       { day: 11, topic: "CSS Grid Masterclass", result: "4/5 MCQ", date: "Yesterday", status: "completed" },
-      { day: 10, topic: "JavaScript Closures", result: "3/3 Tests", date: "2 days ago", status: "completed" },
+      { day: 10, topic: "JavaScript Closures", result: "5/5 MCQ", date: "2 days ago", status: "completed" },
       { day: 9, topic: "Flexbox Layout", result: "5/5 MCQ", date: "3 days ago", status: "completed" }
     ],
     achievements: [
@@ -76,72 +59,137 @@
     ]
   };
 
-  // --- Quiz Questions with Predefined Correct Answers ---
+  // --- Quiz Questions: EXACTLY 10 concept-based questions with predefined correct answers ---
   const QUIZ_QUESTIONS = [
     {
       id: 1,
-      question: "Which CSS property is commonly used to create a responsive layout?",
+      question: "What is the time complexity of Binary Search on a sorted array of N elements?",
       options: [
-        { letter: "A", text: "position" },
-        { letter: "B", text: "display" },
-        { letter: "C", text: "float-only" },
-        { letter: "D", text: "visibility" }
+        { letter: "A", text: "O(N)" },
+        { letter: "B", text: "O(N²)" },
+        { letter: "C", text: "O(log N)" },
+        { letter: "D", text: "O(1)" }
       ],
-      correctAnswer: "B",
-      correct: "B",
-      explanation: "The 'display' property (using flex or grid) is the primary modern CSS tool for responsive layouts."
+      correctAnswer: "C",
+      correct: "C",
+      explanation: "Binary Search repeatedly halves the search space, giving O(log N) time complexity."
     },
     {
       id: 2,
-      question: "What is the main layout advantage of CSS Grid over Flexbox?",
+      question: "Which data structure operates on a Last In, First Out (LIFO) principle?",
       options: [
-        { letter: "A", text: "Grid only works for text elements" },
-        { letter: "B", text: "Grid is 2-dimensional (rows & columns) while Flexbox is 1-dimensional" },
-        { letter: "C", text: "Grid has faster loading performance" },
-        { letter: "D", text: "Flexbox cannot align items vertically" }
+        { letter: "A", text: "Queue" },
+        { letter: "B", text: "Stack" },
+        { letter: "C", text: "Linked List" },
+        { letter: "D", text: "Binary Tree" }
       ],
       correctAnswer: "B",
       correct: "B",
-      explanation: "CSS Grid manages rows and columns simultaneously (2D), whereas Flexbox works along a single axis (1D)."
+      explanation: "A Stack follows LIFO — the last element pushed is the first to be popped."
     },
     {
       id: 3,
-      question: "What is the time complexity of finding the maximum element in an unsorted array of N elements?",
+      question: "In an unsorted array of N elements, what is the time complexity of finding a specific element using Linear Search?",
       options: [
         { letter: "A", text: "O(1)" },
         { letter: "B", text: "O(log N)" },
-        { letter: "C", text: "O(N)" },
-        { letter: "D", text: "O(N²)" }
+        { letter: "C", text: "O(N log N)" },
+        { letter: "D", text: "O(N)" }
       ],
-      correctAnswer: "C",
-      correct: "C",
-      explanation: "You must inspect each array element once, resulting in linear O(N) time complexity."
+      correctAnswer: "D",
+      correct: "D",
+      explanation: "Linear Search checks each element one by one, so in the worst case it visits all N elements — O(N)."
     },
     {
       id: 4,
-      question: "Which CSS media query property tests the max viewport width of a mobile screen?",
+      question: "Which sorting algorithm has an average-case time complexity of O(N log N) and uses a divide-and-conquer strategy?",
       options: [
-        { letter: "A", text: "screen-width" },
-        { letter: "B", text: "max-width" },
-        { letter: "C", text: "resolution" },
-        { letter: "D", text: "device-aspect" }
-      ],
-      correctAnswer: "B",
-      correct: "B",
-      explanation: "'max-width' allows targeting viewports up to a specific pixel width (e.g. max-width: 390px)."
-    },
-    {
-      id: 5,
-      question: "Which CSS unit is relative to the root element's font size?",
-      options: [
-        { letter: "A", text: "px" },
-        { letter: "B", text: "em" },
-        { letter: "C", text: "rem" },
-        { letter: "D", text: "vh" }
+        { letter: "A", text: "Bubble Sort" },
+        { letter: "B", text: "Selection Sort" },
+        { letter: "C", text: "Merge Sort" },
+        { letter: "D", text: "Insertion Sort" }
       ],
       correctAnswer: "C",
       correct: "C",
-      explanation: "'rem' (root em) scales relative to the font size set on the root <html> element."
+      explanation: "Merge Sort divides the array into halves, sorts each, then merges — giving O(N log N) in all cases."
+    },
+    {
+      id: 5,
+      question: "Which data structure is best suited for implementing a printer job queue (first come, first served)?",
+      options: [
+        { letter: "A", text: "Stack" },
+        { letter: "B", text: "Hash Map" },
+        { letter: "C", text: "Binary Tree" },
+        { letter: "D", text: "Queue" }
+      ],
+      correctAnswer: "D",
+      correct: "D",
+      explanation: "A Queue follows FIFO (First In, First Out), making it ideal for printer job scheduling."
+    },
+    {
+      id: 6,
+      question: "Which OOP concept allows a subclass to provide a specific implementation of a method already defined in its parent class?",
+      options: [
+        { letter: "A", text: "Encapsulation" },
+        { letter: "B", text: "Abstraction" },
+        { letter: "C", text: "Method Overriding" },
+        { letter: "D", text: "Method Overloading" }
+      ],
+      correctAnswer: "C",
+      correct: "C",
+      explanation: "Method Overriding lets a subclass redefine a parent class method with its own implementation at runtime (polymorphism)."
+    },
+    {
+      id: 7,
+      question: "What does the CSS 'box-model' property 'box-sizing: border-box' do?",
+      options: [
+        { letter: "A", text: "Adds padding outside the element's border" },
+        { letter: "B", text: "Includes padding and border in the element's total width and height" },
+        { letter: "C", text: "Removes all margins from the element" },
+        { letter: "D", text: "Sets the element's display to block" }
+      ],
+      correctAnswer: "B",
+      correct: "B",
+      explanation: "With 'border-box', padding and border are included within the declared width/height, making layout sizing predictable."
+    },
+    {
+      id: 8,
+      question: "What is the output of: typeof null in JavaScript?",
+      options: [
+        { letter: "A", text: "\"null\"" },
+        { letter: "B", text: "\"undefined\"" },
+        { letter: "C", text: "\"object\"" },
+        { letter: "D", text: "\"boolean\"" }
+      ],
+      correctAnswer: "C",
+      correct: "C",
+      explanation: "In JavaScript, typeof null returns 'object' — this is a well-known historical bug in the language specification."
+    },
+    {
+      id: 9,
+      question: "Which SQL clause is used to filter records AFTER a GROUP BY aggregation has been applied?",
+      options: [
+        { letter: "A", text: "WHERE" },
+        { letter: "B", text: "FILTER" },
+        { letter: "C", text: "HAVING" },
+        { letter: "D", text: "ORDER BY" }
+      ],
+      correctAnswer: "C",
+      correct: "C",
+      explanation: "HAVING filters grouped/aggregated rows. WHERE filters rows before grouping; they serve different purposes."
+    },
+    {
+      id: 10,
+      question: "Which algorithm design technique solves a problem by breaking it into overlapping subproblems and storing their solutions to avoid redundant computation?",
+      options: [
+        { letter: "A", text: "Greedy Algorithm" },
+        { letter: "B", text: "Divide and Conquer" },
+        { letter: "C", text: "Backtracking" },
+        { letter: "D", text: "Dynamic Programming" }
+      ],
+      correctAnswer: "D",
+      correct: "D",
+      explanation: "Dynamic Programming stores solutions to overlapping subproblems (memoization/tabulation) to build up the final solution efficiently."
     }
   ];
 
@@ -151,12 +199,45 @@
       const saved = localStorage.getItem("abtalks_state_v2");
       if (saved) {
         const parsed = JSON.parse(saved);
+        // Safely merge — reset test state if it was from the old 5-question version
+        const oldDay12 = parsed.day12 || {};
+        const safeDay12 = {
+          ...DEFAULT_STATE.day12,
+          ...oldDay12,
+          // Reset userAnswers if test was completed under old 5-question system
+          // (detect by checking if testScore existed and was ≤5 but testNotAttempted is from old data)
+          userAnswers: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? {}
+            : (oldDay12.userAnswers || {}),
+          testCompleted: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? false
+            : (oldDay12.testCompleted || false),
+          testScore: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? null
+            : (oldDay12.testScore !== undefined ? oldDay12.testScore : null),
+          testPercentage: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? null
+            : (oldDay12.testPercentage !== undefined ? oldDay12.testPercentage : null),
+          testCorrect: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? 0
+            : (oldDay12.testCorrect || 0),
+          testWrong: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? 0
+            : (oldDay12.testWrong || 0),
+          testNotAttempted: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? 10
+            : (oldDay12.testNotAttempted !== undefined ? oldDay12.testNotAttempted : 10),
+          daySubmitted: (oldDay12.testCompleted && (oldDay12.testScore || 0) <= 5 && Object.keys(oldDay12.userAnswers || {}).length <= 5)
+            ? false
+            : (oldDay12.daySubmitted || false),
+        };
+
         return {
           ...DEFAULT_STATE,
           ...parsed,
-          day12: { ...DEFAULT_STATE.day12, ...parsed.day12 },
+          day12: safeDay12,
           stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
-          codingProgress: { ...DEFAULT_STATE.codingProgress, ...parsed.codingProgress },
+          learningProgress: { ...DEFAULT_STATE.learningProgress, ...(parsed.learningProgress || parsed.codingProgress || {}) },
           missedDay: { ...DEFAULT_STATE.missedDay, ...parsed.missedDay },
           user: { ...DEFAULT_STATE.user, ...parsed.user }
         };
@@ -244,7 +325,7 @@
   }
 
   // =============================================================
-  // DASHBOARD RENDER (Personalized Greeting & Complete Profile)
+  // DASHBOARD RENDER
   // =============================================================
   function renderDashboardView() {
     const userName = (appState.user.name || "").trim();
@@ -255,7 +336,7 @@
     if (greetingEl) {
       greetingEl.innerHTML = `
         <div class="user-greeting-title">${greetingText}</div>
-        <div class="user-greeting-sub">Track your 60-day challenge progress & daily builds.</div>
+        <div class="user-greeting-sub">Track your 60-day challenge progress &amp; daily builds.</div>
       `;
     }
 
@@ -289,7 +370,7 @@
       }
     }
 
-    // 1. Reminder / Today's Challenge Banner (Feature 8)
+    // 1. Reminder / Today's Challenge Banner
     const reminderCard = document.getElementById("dashboard-reminder");
     if (reminderCard) {
       if (appState.day12.daySubmitted) {
@@ -308,7 +389,7 @@
             <span class="reminder-icon">🔥</span>
             <span class="reminder-title">Today's build is waiting.</span>
           </div>
-          <p class="reminder-sub">Estimated time: 45 min</p>
+          <p class="reminder-sub">Estimated time: 30 min</p>
           <button class="btn-primary" id="btn-start-mission">Start today's mission →</button>
         `;
         document.getElementById("btn-start-mission")?.addEventListener("click", () => navigateTo("/day/12"));
@@ -321,19 +402,20 @@
       challengeCardEl.innerHTML = `
         <div class="card-title">
           <span>TODAY'S CHALLENGE</span>
-          <span class="badge" style="background: rgba(16,185,129,0.12); color: var(--success-color);">Easy • +50 XP</span>
+          <span class="badge" style="background: rgba(16,185,129,0.12); color: var(--success-color);">10 MCQs</span>
         </div>
         <div class="challenge-preview-box">
-          <div class="challenge-preview-title">🧩 Find the Largest Element</div>
-          <div class="challenge-preview-desc">Given an array of integers, find and print the largest element.</div>
+          <div class="challenge-preview-title">📝 Concept Test — Day 12</div>
+          <div class="challenge-preview-desc">Test your understanding across CS fundamentals, data structures, algorithms, web concepts, and more.</div>
           <div class="challenge-preview-meta">
-            <span class="challenge-tag">Array</span>
-            <span class="challenge-tag">Searching</span>
-            <span class="challenge-tag">O(N)</span>
+            <span class="challenge-tag">Data Structures</span>
+            <span class="challenge-tag">Algorithms</span>
+            <span class="challenge-tag">Web</span>
+            <span class="challenge-tag">JavaScript</span>
           </div>
         </div>
         <button class="btn-primary" id="btn-go-challenge" style="margin-top: 12px;">
-          ${appState.day12.codePassed ? '✓ Problem Solved' : 'Start Challenge →'}
+          ${appState.day12.testCompleted ? '✓ Test Completed' : 'Start Test →'}
         </button>
       `;
       document.getElementById("btn-go-challenge")?.addEventListener("click", () => navigateTo("/day/12"));
@@ -353,11 +435,7 @@
           <div class="checklist-item done">✓ Mission Brief</div>
           <div class="checklist-item ${appState.day12.testCompleted ? 'done' : 'pending'}">
             ${appState.day12.testCompleted ? '✓ Daily Test' : '○ Daily Test'}
-            ${appState.day12.testCompleted && appState.day12.testScore !== null ? `<span class="checklist-score">${appState.day12.testScore}/5</span>` : ''}
-          </div>
-          <div class="checklist-item ${appState.day12.codePassed ? 'done' : 'pending'}">
-            ${appState.day12.codePassed ? '✓ Coding Challenge' : '○ Coding Challenge'}
-            ${appState.day12.codePassed ? `<span class="checklist-score">${appState.day12.passedTestCount}/3 tests</span>` : ''}
+            ${appState.day12.testCompleted && appState.day12.testScore !== null ? `<span class="checklist-score">${appState.day12.testScore}/10</span>` : ''}
           </div>
           <div class="checklist-item ${hasGh ? 'done' : 'pending'}">
             ${hasGh ? '✓ GitHub Proof' : '○ GitHub Proof'}
@@ -369,43 +447,43 @@
       `;
     }
 
-    // 4. Coding Progress Card
-    const codingProgressContainer = document.getElementById("dashboard-coding-progress");
-    if (codingProgressContainer) {
-      const p = appState.codingProgress;
-      codingProgressContainer.innerHTML = `
+    // 4. Learning Progress Card (replaces "Coding Progress")
+    const learningProgressContainer = document.getElementById("dashboard-coding-progress");
+    if (learningProgressContainer) {
+      const p = appState.learningProgress || {};
+      learningProgressContainer.innerHTML = `
         <div class="card-title">
-          <span>YOUR CODING PROGRESS</span>
+          <span>YOUR LEARNING PROGRESS</span>
         </div>
         <div class="coding-progress-grid">
           <div class="coding-progress-item">
-            <div class="coding-progress-val">${p.problemsSolved}</div>
-            <div class="coding-progress-lbl">Problems Solved</div>
-          </div>
-          <div class="coding-progress-item">
-            <div class="coding-progress-val">${p.mcqsCompleted}</div>
+            <div class="coding-progress-val">${p.mcqsCompleted || 42}</div>
             <div class="coding-progress-lbl">MCQs Completed</div>
           </div>
           <div class="coding-progress-item">
-            <div class="coding-progress-val">${p.accuracy}%</div>
+            <div class="coding-progress-val">${p.accuracy || 86}%</div>
             <div class="coding-progress-lbl">MCQ Accuracy</div>
           </div>
           <div class="coding-progress-item">
-            <div class="coding-progress-val">${p.codingStreak} 🔥</div>
-            <div class="coding-progress-lbl">Coding Streak</div>
+            <div class="coding-progress-val">${appState.stats.streak} 🔥</div>
+            <div class="coding-progress-lbl">Day Streak</div>
+          </div>
+          <div class="coding-progress-item">
+            <div class="coding-progress-val">${appState.stats.testsCompleted}</div>
+            <div class="coding-progress-lbl">Tests Taken</div>
           </div>
         </div>
         <div class="progress-bar-wrap">
-          <div class="progress-bar-inner" style="width: ${p.progressPct}%"></div>
+          <div class="progress-bar-inner" style="width: ${p.progressPct || 75}%"></div>
         </div>
         <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-secondary); font-weight: 600;">
-          <span>${p.progressPct}% of Day 12 unlocked</span>
+          <span>${p.progressPct || 75}% of Day 12 completed</span>
           <span>Day 12 / 60</span>
         </div>
       `;
     }
 
-    // 5. Build Chain Grid (Feature 3)
+    // 5. Build Chain Grid
     const chainContainer = document.getElementById("build-chain-grid");
     if (chainContainer) {
       chainContainer.innerHTML = "";
@@ -428,7 +506,7 @@
       }
     }
 
-    // 6. Streak Recovery Banner (Feature 4)
+    // 6. Streak Recovery Banner
     const recoveryContainer = document.getElementById("recovery-banner-slot");
     if (recoveryContainer) {
       if (!appState.missedDay.isRecovered) {
@@ -452,7 +530,7 @@
       }
     }
 
-    // 7. Progress Statistics Section (Feature 6)
+    // 7. Progress Statistics Section
     const statDays = document.getElementById("stat-days-built");
     const statStreak = document.getElementById("stat-streak");
     const statTests = document.getElementById("stat-tests");
@@ -463,7 +541,7 @@
     if (statStreak) statStreak.innerText = `${appState.stats.streak} days`;
     if (statTests) statTests.innerText = appState.stats.testsCompleted;
     if (statAvg) statAvg.innerText = `${appState.stats.avgScore}%`;
-    if (statLatest) statLatest.innerText = appState.day12.testScore !== null ? `${appState.day12.testScore} / 5 (${appState.day12.testPercentage}%)` : "Not taken";
+    if (statLatest) statLatest.innerText = appState.day12.testScore !== null ? `${appState.day12.testScore} / 10 (${appState.day12.testPercentage}%)` : "Not taken";
     if (statBuilds) statBuilds.innerText = appState.stats.buildsShipped;
 
     // 8. Recent Activity
@@ -489,7 +567,7 @@
       `;
     }
 
-    // 9. Achievements Section (Feature 5)
+    // 9. Achievements Section
     const achievementsContainer = document.getElementById("achievements-grid");
     if (achievementsContainer) {
       achievementsContainer.innerHTML = "";
@@ -520,12 +598,12 @@
     if (dayNum < 11) {
       statusText = "✓ Completed";
       detailText = dayNum % 2 === 0 ? "JavaScript DOM & State" : "HTML Semantic Structures";
-      scoreText = "Score: 5/5";
+      scoreText = "Score: 5/5 MCQ";
     } else if (dayNum === 11) {
       if (appState.missedDay.isRecovered) {
         statusText = "✓ Completed";
         detailText = "CSS Grid Masterclass";
-        scoreText = "Score: 4/5";
+        scoreText = "Score: 4/5 MCQ";
       } else {
         statusText = "⚠️ Missed";
         detailText = "CSS Grid Masterclass";
@@ -533,8 +611,8 @@
       }
     } else if (dayNum === 12) {
       statusText = appState.day12.daySubmitted ? "✓ Completed" : "⚡ Current Active Day";
-      detailText = "Largest Array Element Challenge";
-      scoreText = appState.day12.testScore !== null ? `Score: ${appState.day12.testScore}/5` : "In Progress";
+      detailText = "CS Fundamentals & Web Concepts";
+      scoreText = appState.day12.testScore !== null ? `Test Score: ${appState.day12.testScore}/10` : "In Progress";
     }
 
     const drawer = document.getElementById("detail-modal");
@@ -568,25 +646,23 @@
   // DAY 12 RENDER
   // =============================================================
   let currentQuestionIndex = 0;
-  let isRunningCode = false;
 
   function renderDay12View() {
     const container = document.getElementById("day12-container");
     if (!container) return;
 
     if (appState.day12.daySubmitted) {
-      // Feature 9: Completion Celebration
       container.innerHTML = `
         <div class="celebration-box card">
           <div class="celebration-icon">✓</div>
           <h2 class="celebration-title">DAY 12 COMPLETE 🎉</h2>
           <p class="celebration-sub" style="margin-bottom: 4px; font-weight: 600;">Another day shipped.</p>
           <p class="celebration-sub" style="color: var(--accent-color); font-weight: 700; margin-bottom: 16px;">Streak: ${appState.stats.streak} days 🔥 • 12 days built</p>
-          
+
           <div class="celebration-metrics">
             <div class="metric-row">
               <span class="metric-lbl">Test score:</span>
-              <span class="metric-val">${appState.day12.testScore} / 5 (${appState.day12.testPercentage}%)</span>
+              <span class="metric-val">${appState.day12.testScore} / 10 (${appState.day12.testPercentage}%)</span>
             </div>
             <div class="metric-row">
               <span class="metric-lbl">Build:</span>
@@ -610,11 +686,10 @@
 
     const missionDone = appState.day12.missionCompleted;
     const testDone = appState.day12.testCompleted;
-    const codeDone = appState.day12.codePassed;
     const proofDone = !!(appState.day12.githubProof && appState.day12.linkedinProof);
 
     container.innerHTML = `
-      <!-- Stepper / Progress Indicator (Feature 2) -->
+      <!-- Stepper: MISSION → TEST → PROOF → COMPLETE (4 steps, no CODE step) -->
       <div class="stage-stepper">
         <div class="stage-step ${missionDone ? 'completed' : 'active'}">
           <div class="stage-dot">${missionDone ? '✓' : '1'}</div>
@@ -626,18 +701,13 @@
           <span>TEST</span>
         </div>
         <div class="stage-line"></div>
-        <div class="stage-step ${codeDone ? 'completed' : (testDone ? 'active' : '')}">
-          <div class="stage-dot">${codeDone ? '✓' : '3'}</div>
-          <span>CODE</span>
-        </div>
-        <div class="stage-line"></div>
-        <div class="stage-step ${proofDone ? 'completed' : (codeDone ? 'active' : '')}">
-          <div class="stage-dot">${proofDone ? '✓' : '4'}</div>
+        <div class="stage-step ${proofDone ? 'completed' : (testDone ? 'active' : '')}">
+          <div class="stage-dot">${proofDone ? '✓' : '3'}</div>
           <span>PROOF</span>
         </div>
         <div class="stage-line"></div>
         <div class="stage-step ${appState.day12.daySubmitted ? 'completed' : ''}">
-          <div class="stage-dot">5</div>
+          <div class="stage-dot">4</div>
           <span>COMPLETE</span>
         </div>
       </div>
@@ -646,133 +716,19 @@
       <div class="card">
         <div class="mission-header">
           <div class="mission-tag">Day 12 Mission</div>
-          <h2 class="mission-title">Find Largest Element & Responsive Viewports</h2>
-          <p class="mission-desc">Solve array optimization algorithms and build mobile responsive viewports using Flexbox & Grid.</p>
+          <h2 class="mission-title">CS Fundamentals & Web Concepts</h2>
+          <p class="mission-desc">Sharpen your understanding of data structures, algorithms, time complexity, web technologies, and programming fundamentals.</p>
         </div>
       </div>
 
-      <!-- Daily Coding Test Section (Part 1 - 5) -->
+      <!-- Daily MCQ Test Section -->
       <div class="card" id="quiz-card">
         <div class="card-title">
           <span>Test your understanding</span>
-          <span class="badge">${testDone ? 'Complete 🎉' : '5 Questions'}</span>
+          <span class="badge">${testDone ? 'Complete 🎉' : '10 Questions'}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Complete this short test before submitting today's build.</p>
         <div id="quiz-body"></div>
-      </div>
-
-      <!-- Coding Problem Section -->
-      <div class="card" id="coding-card">
-        <div class="card-title">
-          <span>Today's Coding Problem</span>
-          <span class="badge" style="background: rgba(16,185,129,0.1); color: var(--success-color);">Easy • +50 XP</span>
-        </div>
-
-        <div class="challenge-spec-box">
-          <div style="font-weight: 800; font-size: 15px; margin-bottom: 4px;">Find the Largest Element</div>
-          <p style="color: var(--text-secondary); margin-bottom: 8px;">Given an array of integers, find and print the largest element.</p>
-
-          <div class="spec-title">Input Format:</div>
-          <div class="spec-code-block">First line: integer N (number of elements)\nSecond line: N space-separated integers</div>
-
-          <div class="spec-title">Output Format:</div>
-          <div class="spec-code-block">Print a single integer — the maximum element.</div>
-
-          <div class="spec-title">Constraints:</div>
-          <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary); margin-top: 2px;">1 ≤ N ≤ 10⁵ &nbsp;|&nbsp; -10⁹ ≤ arr[i] ≤ 10⁹</div>
-
-          <div class="spec-title">Sample Input:</div>
-          <div class="spec-code-block">5\n10 20 5 30 15</div>
-
-          <div class="spec-title">Sample Output:</div>
-          <div class="spec-code-block">30</div>
-        </div>
-
-        <div class="lang-selector-row">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Language:</span>
-          <select id="lang-select-dropdown" class="lang-select-dropdown">
-            <option value="python" ${appState.day12.codeLanguage === 'python' ? 'selected' : ''}>Python</option>
-            <option value="c" ${appState.day12.codeLanguage === 'c' ? 'selected' : ''}>C</option>
-            <option value="cpp" ${appState.day12.codeLanguage === 'cpp' ? 'selected' : ''}>C++</option>
-            <option value="java" ${appState.day12.codeLanguage === 'java' ? 'selected' : ''}>Java</option>
-          </select>
-        </div>
-
-        <div class="editor-wrapper">
-          <div class="editor-line-nums" id="editor-line-nums">1</div>
-          <textarea id="code-editor" class="editor-textarea" spellcheck="false">${escapeHtml(appState.day12.codeContent)}</textarea>
-        </div>
-
-        <!-- Test Cases -->
-        <div class="test-cases-header">
-          <div style="font-size: 13px; font-weight: 700;">Test Cases</div>
-          ${appState.day12.codeExecuted ? `<div class="test-summary-badge">${appState.day12.passedTestCount} / 3 Passed</div>` : ''}
-        </div>
-        <div class="test-cases-box">
-          <div class="test-case-card" id="tc-card-1">
-            <div class="test-case-header">
-              <span>Test Case 1</span>
-              <span id="tc-1-status" class="test-status ${getTestStatus(1)}">
-                ${getTestStatusLabel(1)}
-              </span>
-            </div>
-            <div class="test-case-io">
-              <span class="io-label">Input:</span>
-              <code>5 → [10, 20, 5, 30, 15]</code>
-            </div>
-            <div class="test-case-io">
-              <span class="io-label">Expected:</span>
-              <code>30</code>
-            </div>
-          </div>
-
-          <div class="test-case-card" id="tc-card-2">
-            <div class="test-case-header">
-              <span>Test Case 2</span>
-              <span id="tc-2-status" class="test-status ${getTestStatus(2)}">
-                ${getTestStatusLabel(2)}
-              </span>
-            </div>
-            <div class="test-case-io">
-              <span class="io-label">Input:</span>
-              <code>4 → [7, 3, 9, 2]</code>
-            </div>
-            <div class="test-case-io">
-              <span class="io-label">Expected:</span>
-              <code>9</code>
-            </div>
-          </div>
-
-          <div class="test-case-card" id="tc-card-3">
-            <div class="test-case-header">
-              <span>Test Case 3 <span class="hidden-badge">Hidden</span></span>
-              <span id="tc-3-status" class="test-status ${getTestStatus(3)}">
-                ${getTestStatusLabel(3)}
-              </span>
-            </div>
-            <div class="test-case-io">
-              <span class="io-label">Input:</span>
-              <code>Hidden edge case</code>
-            </div>
-            <div class="test-case-io">
-              <span class="io-label">Expected:</span>
-              <code>Hidden</code>
-            </div>
-          </div>
-        </div>
-
-        <div id="run-results-area" style="margin-bottom: 12px;"></div>
-
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-secondary" id="btn-run-code">▶ Run Code</button>
-          <button class="btn-primary" id="btn-submit-code" ${appState.day12.codePassed ? 'disabled style="opacity:0.6;"' : ''}>
-            ${appState.day12.codePassed ? '✓ Submitted' : 'Submit Code'}
-          </button>
-        </div>
-
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <button class="btn-link" id="btn-reset-code">↺ Reset Code</button>
-        </div>
       </div>
 
       <!-- Build Submission Flow Section -->
@@ -801,67 +757,21 @@
           <input type="text" id="input-linkedin" class="form-input" placeholder="https://linkedin.com/posts/day12-challenge" value="${appState.day12.linkedinProof || ''}">
         </div>
 
-        ${!testDone || !codeDone ? `<div class="proof-warning">⚠️ Complete the Daily Test and Coding Challenge first to enable submission.</div>` : ''}
+        ${!testDone ? `<div class="proof-warning">⚠️ Complete the Daily Test first to enable submission.</div>` : ''}
 
-        <button class="btn-primary" id="btn-submit-day" ${!(testDone && codeDone && appState.day12.githubProof && appState.day12.linkedinProof) ? 'disabled' : ''}>
+        <button class="btn-primary" id="btn-submit-day" ${!(testDone && appState.day12.githubProof && appState.day12.linkedinProof) ? 'disabled' : ''}>
           🚀 Submit Day 12 →
         </button>
       </div>
     `;
 
-    // Wire up all event handlers
-    wireDay12Events();
-    updateEditorLineNumbers();
+    // Wire proof input handlers
+    wireProofEvents();
+    // Render MCQ
     renderQuizBody();
   }
 
-  function getTestStatus(tcNum) {
-    if (!appState.day12.codeExecuted) return "pending";
-    const passed = appState.day12.passedTestCount;
-    if (tcNum <= passed) return "passed";
-    return "failed";
-  }
-
-  function getTestStatusLabel(tcNum) {
-    if (!appState.day12.codeExecuted) return "Pending";
-    const passed = appState.day12.passedTestCount;
-    if (tcNum <= passed) return "✓ Passed";
-    return "✗ Failed";
-  }
-
-  function wireDay12Events() {
-    // Language selector
-    const langSelect = document.getElementById("lang-select-dropdown");
-    langSelect?.addEventListener("change", () => {
-      const lang = langSelect.value;
-      appState.day12.codeLanguage = lang;
-      appState.day12.codeContent = STARTER_CODES[lang];
-      appState.day12.codeExecuted = false;
-      appState.day12.passedTestCount = 0;
-      saveState();
-      renderDay12View();
-    });
-
-    // Code editor
-    const codeEditor = document.getElementById("code-editor");
-    codeEditor?.addEventListener("input", () => {
-      appState.day12.codeContent = codeEditor.value;
-      saveState();
-      updateEditorLineNumbers();
-    });
-
-    // Run code
-    document.getElementById("btn-run-code")?.addEventListener("click", runCodeRunner);
-    document.getElementById("btn-submit-code")?.addEventListener("click", submitCodeRunner);
-    document.getElementById("btn-reset-code")?.addEventListener("click", () => {
-      appState.day12.codeContent = STARTER_CODES[appState.day12.codeLanguage];
-      appState.day12.codeExecuted = false;
-      appState.day12.passedTestCount = 0;
-      saveState();
-      renderDay12View();
-    });
-
-    // Proof inputs
+  function wireProofEvents() {
     const ghInput = document.getElementById("input-github");
     const liInput = document.getElementById("input-linkedin");
     const submitDayBtn = document.getElementById("btn-submit-day");
@@ -870,8 +780,9 @@
       appState.day12.githubProof = ghInput?.value.trim() || "";
       appState.day12.linkedinProof = liInput?.value.trim() || "";
       saveState();
-      const canSubmit = appState.day12.testCompleted && appState.day12.codePassed
-        && appState.day12.githubProof && appState.day12.linkedinProof;
+      const canSubmit = appState.day12.testCompleted
+        && appState.day12.githubProof
+        && appState.day12.linkedinProof;
       if (submitDayBtn) {
         if (canSubmit) submitDayBtn.removeAttribute("disabled");
         else submitDayBtn.setAttribute("disabled", "true");
@@ -883,241 +794,8 @@
     submitDayBtn?.addEventListener("click", submitDayAction);
   }
 
-  function updateEditorLineNumbers() {
-    const editor = document.getElementById("code-editor");
-    const lineNums = document.getElementById("editor-line-nums");
-    if (!editor || !lineNums) return;
-    const lines = editor.value.split("\n").length;
-    lineNums.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join("<br>");
-  }
-
   // =============================================================
-  // CODE EVALUATION ENGINE (Smart Mock)
-  // =============================================================
-  function evaluateCode(code, language) {
-    const trimmed = code.trim();
-
-    if (!trimmed || trimmed.length < 5) {
-      return {
-        type: "compile_error",
-        error: `${language === 'python' ? 'SyntaxError' : 'CompilationError'}: Empty file — no code found.`,
-        passed: 0
-      };
-    }
-
-    const openBrackets = (trimmed.match(/[\(\[\{]/g) || []).length;
-    const closeBrackets = (trimmed.match(/[\)\]\}]/g) || []).length;
-    if (Math.abs(openBrackets - closeBrackets) > 2) {
-      return {
-        type: "compile_error",
-        error: `${language === 'c' || language === 'cpp' ? 'error' : 'SyntaxError'}: Mismatched brackets — check your code structure.`,
-        passed: 0
-      };
-    }
-
-    const hasMaxLogic = /max|largest|greatest|Math\.max|sort|max_element/i.test(trimmed);
-    const hasLoop = /for|while|forEach|reduce/i.test(trimmed);
-    const hasInput = /input|scanf|cin|Scanner|readline/i.test(trimmed);
-    const hasOutput = /print|printf|cout|System\.out|console\.log/i.test(trimmed);
-
-    let passed = 0;
-    if (hasOutput) passed = 1;
-    if (hasOutput && hasLoop) passed = 2;
-    if (hasOutput && hasLoop && (hasMaxLogic || hasInput)) passed = 3;
-
-    const isStarterCode = STARTER_CODES[language] && trimmed === STARTER_CODES[language].trim();
-    if (isStarterCode) passed = 3;
-
-    return { type: "success", passed };
-  }
-
-  function runCodeRunner() {
-    if (isRunningCode) return;
-    const codeEditor = document.getElementById("code-editor");
-    const code = codeEditor?.value || appState.day12.codeContent;
-    const runBtn = document.getElementById("btn-run-code");
-    const submitBtn = document.getElementById("btn-submit-code");
-    const resultsArea = document.getElementById("run-results-area");
-
-    isRunningCode = true;
-    if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = "⏳ Running..."; }
-    if (submitBtn) submitBtn.disabled = true;
-    if (resultsArea) {
-      resultsArea.innerHTML = `
-        <div class="run-loading">
-          <div class="loading-spinner"></div>
-          <span>Compiling and running test cases...</span>
-        </div>
-      `;
-    }
-
-    setTimeout(() => {
-      const result = evaluateCode(code, appState.day12.codeLanguage);
-      isRunningCode = false;
-
-      if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = "▶ Run Code"; }
-      if (submitBtn && !appState.day12.codePassed) submitBtn.disabled = false;
-
-      if (result.type === "compile_error") {
-        animateTestCases(0);
-        appState.day12.codeExecuted = true;
-        appState.day12.passedTestCount = 0;
-        saveState();
-        if (resultsArea) {
-          resultsArea.innerHTML = `
-            <div class="run-result-error">
-              <div class="run-result-title">⚠️ Compilation Error</div>
-              <div class="run-result-detail">${result.error}</div>
-            </div>
-          `;
-        }
-      } else {
-        const passed = result.passed;
-        appState.day12.codeExecuted = true;
-        appState.day12.passedTestCount = passed;
-        saveState();
-        animateTestCases(passed);
-        if (resultsArea) {
-          resultsArea.innerHTML = `
-            <div class="${passed === 3 ? 'run-result-success' : 'run-result-partial'}">
-              <div class="run-result-title">${passed === 3 ? '🎉 ' : ''}${passed} / 3 Test Cases Passed</div>
-              <div class="run-result-detail">
-                ${[1,2,3].map(i => `<span class="${i <= passed ? 'tc-pass' : 'tc-fail'}">${i <= passed ? '✓' : '✗'} Test ${i}</span>`).join(' ')}
-              </div>
-            </div>
-          `;
-        }
-      }
-
-      const tcHeader = document.querySelector(".test-cases-header");
-      if (tcHeader) {
-        const existing = tcHeader.querySelector(".test-summary-badge");
-        if (existing) existing.remove();
-        const badge = document.createElement("div");
-        badge.className = "test-summary-badge";
-        badge.textContent = `${appState.day12.passedTestCount} / 3 Passed`;
-        tcHeader.appendChild(badge);
-      }
-    }, 1400);
-  }
-
-  function animateTestCases(passed) {
-    [1, 2, 3].forEach((i, idx) => {
-      setTimeout(() => {
-        const statusEl = document.getElementById(`tc-${i}-status`);
-        const cardEl = document.getElementById(`tc-card-${i}`);
-        if (statusEl) {
-          const isPassed = i <= passed;
-          statusEl.className = `test-status ${isPassed ? 'passed' : 'failed'} tc-animate`;
-          statusEl.textContent = isPassed ? "✓ Passed" : "✗ Failed";
-        }
-        if (cardEl) {
-          cardEl.classList.add(i <= passed ? 'tc-pass-card' : 'tc-fail-card');
-        }
-      }, idx * 300);
-    });
-  }
-
-  function submitCodeRunner() {
-    if (isRunningCode) return;
-    const codeEditor = document.getElementById("code-editor");
-    const code = codeEditor?.value || appState.day12.codeContent;
-    const runBtn = document.getElementById("btn-run-code");
-    const submitBtn = document.getElementById("btn-submit-code");
-    const resultsArea = document.getElementById("run-results-area");
-
-    isRunningCode = true;
-    if (runBtn) runBtn.disabled = true;
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "⏳ Submitting..."; }
-    if (resultsArea) {
-      resultsArea.innerHTML = `
-        <div class="run-loading">
-          <div class="loading-spinner"></div>
-          <span>Running all test cases for submission...</span>
-        </div>
-      `;
-    }
-
-    setTimeout(() => {
-      const result = evaluateCode(code, appState.day12.codeLanguage);
-      isRunningCode = false;
-
-      const passed = result.type === "compile_error" ? 0 : result.passed;
-      appState.day12.codeExecuted = true;
-      appState.day12.passedTestCount = passed;
-
-      if (passed === 3) {
-        appState.day12.codePassed = true;
-        appState.codingProgress.problemsSolved = 19;
-        appState.codingProgress.codingStreak = 8;
-      }
-      saveState();
-      animateTestCases(passed);
-
-      if (runBtn) runBtn.disabled = false;
-
-      const drawer = document.getElementById("detail-modal");
-      if (drawer) {
-        if (passed === 3) {
-          drawer.innerHTML = `
-            <div class="drawer-content" style="text-align: center;">
-              <div class="drawer-handle"></div>
-              <div style="font-size: 44px; margin-bottom: 8px;">🎉</div>
-              <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Problem Solved!</h2>
-              <div style="font-size: 14px; font-weight: 700; color: var(--success-color); margin-bottom: 16px;">3 / 3 Test Cases Passed</div>
-              <div class="celebration-metrics">
-                <div class="metric-row">
-                  <span class="metric-lbl">Accuracy</span>
-                  <span class="metric-val" style="color: var(--success-color)">100%</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-lbl">Difficulty</span>
-                  <span class="metric-val">Easy</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-lbl">XP Earned</span>
-                  <span class="metric-val" style="color: var(--accent-color)">+50 XP 🔥</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-lbl">Coding Streak</span>
-                  <span class="metric-val">🔥 ${appState.codingProgress.codingStreak} days</span>
-                </div>
-              </div>
-              <button class="btn-primary" id="btn-continue-challenge">Continue Challenge →</button>
-            </div>
-          `;
-        } else {
-          drawer.innerHTML = `
-            <div class="drawer-content" style="text-align: center;">
-              <div class="drawer-handle"></div>
-              <div style="font-size: 44px; margin-bottom: 8px;">⚠️</div>
-              <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Partial Submission</h2>
-              <div style="font-size: 14px; font-weight: 700; color: var(--warning-color); margin-bottom: 16px;">${passed} / 3 Test Cases Passed</div>
-              <div class="celebration-metrics">
-                <div class="metric-row">
-                  <span class="metric-lbl">Failed Tests</span>
-                  <span class="metric-val" style="color: var(--missed-color)">${3 - passed} test case(s) failed</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-lbl">Hint</span>
-                  <span class="metric-val">Check your loop logic</span>
-                </div>
-              </div>
-              <button class="btn-secondary" id="btn-continue-challenge">Fix Code & Retry</button>
-            </div>
-          `;
-        }
-        document.getElementById("modal-overlay")?.classList.add("active");
-        document.getElementById("btn-continue-challenge")?.addEventListener("click", () => {
-          closeModal();
-          renderDay12View();
-        });
-      }
-    }, 1600);
-  }
-
-  // =============================================================
-  // QUIZ EVALUATION ENGINE & RENDERER (Parts 1 - 5)
+  // QUIZ EVALUATION ENGINE & RENDERER — 10 QUESTIONS
   // =============================================================
   function evaluateQuestion(q, rawUserAnswer) {
     if (rawUserAnswer === undefined || rawUserAnswer === null) {
@@ -1152,9 +830,9 @@
         <div class="quiz-complete-box">
           <div class="quiz-complete-icon">🎉</div>
           <div class="quiz-complete-title" style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">TEST COMPLETE 🎉</div>
-          <div class="quiz-complete-score" style="font-size: 22px; font-weight: 800; color: var(--accent-color);">Score: ${score} / 5</div>
+          <div class="quiz-complete-score" style="font-size: 22px; font-weight: 800; color: var(--accent-color);">Score: ${score} / 10</div>
           <div class="quiz-complete-percentage" style="font-size: 15px; font-weight: 700; color: var(--text-secondary); margin-top: 2px;">Percentage: ${pct}%</div>
-          
+
           <div style="display: flex; justify-content: center; gap: 10px; font-size: 12px; font-weight: 700; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); flex-wrap: wrap;">
             <span style="color: var(--success-color);">Correct: ${correct}</span>
             <span style="color: var(--missed-color);">Wrong: ${wrong}</span>
@@ -1170,7 +848,7 @@
     const q = QUIZ_QUESTIONS[currentQuestionIndex];
     const selectedAns = appState.day12.userAnswers[q.id];
 
-    // Progress dots
+    // Progress dots — 10 dots
     const progressDots = QUIZ_QUESTIONS.map((_, i) => {
       const ans = appState.day12.userAnswers[QUIZ_QUESTIONS[i].id];
       let cls = "q-dot";
@@ -1208,15 +886,13 @@
       </div>
     `;
 
-    // Option selection & unselection handler (Part 2, Test Cases 5 & 6)
+    // Option selection & unselection — clicking same answer again clears it
     quizBody.querySelectorAll(".quiz-option").forEach(opt => {
       opt.addEventListener("click", () => {
         const letter = opt.dataset.letter;
         if (appState.day12.userAnswers[q.id] === letter) {
-          // Unselect / clear answer
           delete appState.day12.userAnswers[q.id];
         } else {
-          // Select or change answer
           appState.day12.userAnswers[q.id] = letter;
         }
         saveState();
@@ -1262,13 +938,14 @@
     appState.day12.testNotAttempted = notAttemptedCount;
 
     appState.stats.testsCompleted += 1;
-    const totalMcqs = (appState.codingProgress.mcqsCompleted || 40) + correctCount;
-    appState.codingProgress.mcqsCompleted = totalMcqs;
+    const totalMcqs = (appState.learningProgress.mcqsCompleted || 42) + correctCount;
+    appState.learningProgress.mcqsCompleted = totalMcqs;
 
     const prevPct = appState.stats.avgScore * (appState.stats.testsCompleted - 1);
     appState.stats.avgScore = Math.min(100, Math.max(0, Math.round((prevPct + percentage) / appState.stats.testsCompleted)));
 
-    if (score === 5) {
+    // Perfect score = 10/10
+    if (score === QUIZ_QUESTIONS.length) {
       const perfAch = appState.achievements.find(a => a.id === "perfect");
       if (perfAch) perfAch.unlocked = true;
     }
@@ -1292,7 +969,7 @@
         <div class="drawer-handle"></div>
         <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px;">Question Results Review</h3>
         <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
-          Score: <strong>${score} / 5</strong> (${pct}%) • Correct: ${correctCount} | Wrong: ${wrongCount} | Not Attempted: ${notAttemptedCount}
+          Score: <strong>${score} / 10</strong> (${pct}%) &nbsp;•&nbsp; Correct: ${correctCount} | Wrong: ${wrongCount} | Not Attempted: ${notAttemptedCount}
         </div>
     `;
 
@@ -1327,11 +1004,11 @@
             </div>
             <div class="review-ans-row">
               <span class="review-lbl">Status:</span>
-              <span class="review-val" style="font-weight: 700;">${ev.label}</span>
+              <span style="font-weight: 700;">${ev.label}</span>
             </div>
             <div class="review-ans-row">
               <span class="review-lbl">Marks:</span>
-              <span class="review-val" style="font-weight: 700;">${ev.mark}/1</span>
+              <span style="font-weight: 700;">${ev.mark}/1</span>
             </div>
           </div>
           <div class="review-explanation">💡 ${q.explanation}</div>
@@ -1354,11 +1031,11 @@
     appState.stats.daysBuilt = 12;
     appState.stats.buildsShipped = 11;
     appState.stats.streak = Math.max(appState.stats.streak, 12);
-    appState.codingProgress.progressPct = 100;
+    appState.learningProgress.progressPct = 100;
     appState.recentActivity.unshift({
       day: 12,
-      topic: "Largest Array Element",
-      result: `${appState.day12.passedTestCount}/3 Tests`,
+      topic: "CS Fundamentals & Web Concepts",
+      result: `${appState.day12.testScore}/10 MCQ`,
       date: "Just now",
       status: "completed"
     });
@@ -1368,7 +1045,7 @@
   }
 
   // =============================================================
-  // PROFILE / SETTINGS DRAWER (Parts 6 - 9 & Part 10)
+  // PROFILE / SETTINGS DRAWER
   // =============================================================
   function openProfileDrawer() {
     const drawer = document.getElementById("detail-modal");
@@ -1380,7 +1057,7 @@
     drawer.innerHTML = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
-        
+
         <div class="profile-avatar-row">
           <div class="avatar-circle">${currentName ? currentName.charAt(0).toUpperCase() : 'A'}</div>
           <div>
@@ -1390,7 +1067,7 @@
           </div>
         </div>
 
-        <!-- Name Editing Form (Parts 6 & 7) -->
+        <!-- Name Editing Form -->
         <div class="card" style="margin-bottom: 16px;">
           <div class="card-title" style="margin-bottom: 8px;">
             <span>${isCompleted ? 'Edit Profile' : 'Complete Your Profile'}</span>
@@ -1442,7 +1119,6 @@
 
     document.getElementById("modal-overlay")?.classList.add("active");
 
-    // Profile Save Action (Parts 6 & 7 & Test Case 8)
     document.getElementById("btn-save-profile-action")?.addEventListener("click", () => {
       const inputVal = document.getElementById("profile-name-input")?.value || "";
       const trimmed = inputVal.trim();
