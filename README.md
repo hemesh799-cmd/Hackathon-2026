@@ -22,7 +22,7 @@ ABTalks is a mobile-first student product for the 60-Day Coding Challenge. Stude
 - **Backend / DB**: None required — lightweight, fast, self-contained mock evaluation & persistent storage
 - **Deployment**: vercel
 
-- ## Design System
+ ## Design System
 
 ### Colors
 - **Background:** `#F7F7F5`
