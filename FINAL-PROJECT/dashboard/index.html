@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ABTalks 60-Day Coding Challenge - Dashboard</title>
+  <meta name="description" content="ABTalks 60-Day Coding Challenge Dashboard — track your daily builds and coding progress.">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="brand-logo">
+        <span>ABTalks</span>
+        <span class="brand-badge">60 DAYS</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-profile-trigger" title="Profile & Settings">👤</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section id="view-dashboard" class="page-view active">
+        <div id="dashboard-user-greeting" class="dashboard-user-greeting"></div>
+        <div id="dashboard-profile-card"></div>
+        <div id="dashboard-reminder" class="card reminder-card"></div>
+        <div id="dashboard-challenge-card" class="card"></div>
+        <div id="dashboard-today-progress" class="card"></div>
+        <div id="dashboard-coding-progress" class="card"></div>
+        <div class="card">
+          <div class="card-title">
+            <span>Build Chain</span>
+            <span class="badge">Keep the chain alive 🔥</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-secondary);">12 days built • Tap any day to inspect status</p>
+          <div id="build-chain-grid" class="chain-grid"></div>
+          <div id="recovery-banner-slot"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span>Your Progress</span></div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div id="stat-days-built" class="stat-val">12 / 60</div>
+              <div class="stat-lbl">Days Completed</div>
+            </div>
+            <div class="stat-card">
+              <div id="stat-streak" class="stat-val">11 days</div>
+              <div class="stat-lbl">Current Streak</div>
+            </div>
+            <div class="stat-card">
+              <div id="stat-tests" class="stat-val">10</div>
+              <div class="stat-lbl">Tests Completed</div>
+            </div>
+            <div class="stat-card">
+              <div id="stat-avg-score" class="stat-val">86%</div>
+              <div class="stat-lbl">Avg Test Score</div>
+            </div>
+            <div class="stat-card" style="grid-column: span 2;">
+              <div id="stat-builds-shipped" class="stat-val">10</div>
+              <div class="stat-lbl">Builds Shipped</div>
+            </div>
+          </div>
+        </div>
+        <div id="dashboard-recent-activity" class="card"></div>
+        <div class="card">
+          <div class="card-title"><span>Achievements</span></div>
+          <div id="achievements-grid" class="achievements-grid"></div>
+        </div>
+      </section>
+
+      <section id="view-day12" class="page-view">
+        <div id="day12-container"></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="/dashboard" id="nav-dashboard" class="nav-item active">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="/day/12" id="nav-day12" class="nav-item">
+        <span class="nav-icon">⚡</span>
+        <span>Day 12</span>
+      </a>
+    </nav>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="detail-modal"></div>
+  </div>
+
+  <script src="../app.js"></script>
+</body>
+</html>
