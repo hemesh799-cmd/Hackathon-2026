@@ -22,6 +22,52 @@ ABTalks is a mobile-first student product for the 60-Day Coding Challenge. Stude
 - **Backend / DB**: None required — lightweight, fast, self-contained mock evaluation & persistent storage
 - **Deployment**: vercel
 
+- ## Design System
+
+### Colors
+- **Background:** `#F7F7F5`
+- **Surface/Card:** `#FFFFFF`
+- **Primary Text:** `#111111`
+- **Secondary Text:** `#6B6B6B`
+- **Primary Accent:** `#FF5A36` (ABTalks Orange)
+- **Dark Accent:** `#171717`
+- **Border:** `#E6E6E1`
+- **Success:** `#1F9D68`
+- **Error:** `#D64545`
+- **Warning:** `#D98A00`
+
+### Typography
+- **Font:** Inter / system sans-serif
+- **Hero:** 32px / 700–800
+- **Headings:** 20–24px / 700
+- **Body:** 14–16px / 400–500
+- **Buttons:** 14–16px / 600
+
+### Components
+- **Cards:** White background, `18px` radius, `1px` border
+- **Buttons:** `12px` radius, minimum `44px` height
+- **Inputs:** `12px` radius, `44–48px` height
+- **Pills/Badges:** `999px` radius
+- **Page Padding:** `16px` mobile
+- **Spacing:** 4px-based scale
+
+### States
+- **Correct/Completed:** `#1F9D68` ✓
+- **Wrong/Error:** `#D64545` ✗
+- **Warning/Missed:** `#D98A00`
+- **Not Attempted:** `#6B6B6B`
+
+### Theme
+Supports **Light, Dark, and System** themes while maintaining ABTalkS Orange as the primary accent.
+
+### UX Principles
+- Mobile-first, optimized for **390px**
+- Clear progress and feedback
+- Minimum `44px` touch targets
+- No horizontal scrolling
+- Consistent spacing and visual hierarchy
+- Accessibility-friendly contrast and status indicators
+
 ---
 
 ## ✨ Features
