@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ABTalks 60-Day Coding Challenge</title>
-  <meta name="description" content="ABTalks 60-Day Coding Challenge student app with hands-on coding problem solving.">
+  <meta name="description" content="ABTalks 60-Day Coding Challenge — build, test, code, and ship every day.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,11 +25,14 @@
 
     <!-- Main Content Area -->
     <main class="app-main">
-      
+
       <!-- DASHBOARD VIEW (/dashboard) -->
       <section id="view-dashboard" class="page-view active">
         <!-- Daily Reminder Banner -->
         <div id="dashboard-reminder" class="card reminder-card"></div>
+
+        <!-- Today's Challenge Card -->
+        <div id="dashboard-challenge-card" class="card"></div>
 
         <!-- Today's Progress Checklist Card -->
         <div id="dashboard-today-progress" class="card"></div>
@@ -44,7 +47,7 @@
             <span class="badge">Keep the chain alive 🔥</span>
           </div>
           <p style="font-size: 13px; color: var(--text-secondary);">12 days built • Tap any day to inspect status</p>
-          
+
           <div id="build-chain-grid" class="chain-grid"></div>
 
           <!-- Streak Recovery Container -->
@@ -73,8 +76,15 @@
               <div id="stat-avg-score" class="stat-val">86%</div>
               <div class="stat-lbl">Avg Test Score</div>
             </div>
+            <div class="stat-card" style="grid-column: span 2;">
+              <div id="stat-builds-shipped" class="stat-val">10</div>
+              <div class="stat-lbl">Builds Shipped</div>
+            </div>
           </div>
         </div>
+
+        <!-- Recent Activity Section -->
+        <div id="dashboard-recent-activity" class="card"></div>
 
         <!-- Achievements Section -->
         <div class="card">

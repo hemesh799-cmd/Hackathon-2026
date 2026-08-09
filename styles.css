@@ -978,3 +978,617 @@ body {
   font-weight: 700;
   color: var(--text-primary);
 }
+
+/* ============================================================
+   ABTalks v2 Upgrade Styles
+   ============================================================ */
+
+/* --- Today's Challenge Card --- */
+.challenge-preview-box {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 4px;
+}
+
+.challenge-preview-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.challenge-preview-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.challenge-preview-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.challenge-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--accent-light);
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* --- Checklist Score Inline Badge --- */
+.checklist-score {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success-color);
+  background: var(--success-bg);
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+
+/* --- Coding Progress Grid (v2) --- */
+.coding-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.coding-progress-item {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.coding-progress-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-color);
+  line-height: 1.2;
+}
+
+.coding-progress-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* --- Progress Bar --- */
+.progress-bar-wrap {
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-color), #FF8A65);
+  border-radius: 3px;
+  transition: width 600ms ease;
+}
+
+/* --- Recent Activity --- */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.activity-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activity-dot.completed { background: var(--success-color); }
+.activity-dot.pending { background: var(--warning-color); }
+
+.activity-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.activity-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.activity-badge.completed {
+  color: var(--success-color);
+  background: var(--success-bg);
+}
+
+/* --- Mission Header --- */
+.mission-header { padding: 2px 0; }
+
+.mission-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.mission-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+
+.mission-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* --- Quiz Progress Dots --- */
+.quiz-progress-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.q-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-color);
+  transition: all 200ms ease;
+}
+
+.q-dot-active {
+  width: 20px;
+  border-radius: 4px;
+  background: var(--accent-color);
+}
+
+.q-dot-answered { background: var(--success-color); }
+
+/* --- Quiz Complete Box --- */
+.quiz-complete-box {
+  background: linear-gradient(135deg, rgba(255,90,54,0.06), rgba(255,90,54,0.02));
+  border: 1px solid rgba(255,90,54,0.25);
+  border-radius: 14px;
+  padding: 20px 16px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.quiz-complete-icon { font-size: 32px; margin-bottom: 6px; }
+
+.quiz-complete-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.quiz-complete-score {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.quiz-complete-accuracy {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+/* --- Quiz Option States (v2 Feedback) --- */
+.quiz-option.correct-answer {
+  border-color: var(--success-color) !important;
+  background-color: var(--success-bg) !important;
+  color: var(--success-color) !important;
+  font-weight: 700;
+}
+
+.quiz-option.correct-answer .quiz-opt-letter {
+  background-color: var(--success-color);
+  color: #FFFFFF;
+  border-color: var(--success-color);
+}
+
+.quiz-option.wrong-answer {
+  border-color: var(--missed-color) !important;
+  background-color: var(--missed-bg) !important;
+  color: var(--missed-color) !important;
+  font-weight: 700;
+}
+
+.quiz-option.wrong-answer .quiz-opt-letter {
+  background-color: var(--missed-color);
+  color: #FFFFFF;
+  border-color: var(--missed-color);
+}
+
+.quiz-option.dimmed-option {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* --- Answer Feedback Inline Tag --- */
+.ans-feedback {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.ans-feedback.correct { color: var(--success-color); background: var(--success-bg); }
+.ans-feedback.wrong { color: var(--missed-color); background: var(--missed-bg); }
+
+/* --- Quiz Explanation Box --- */
+.quiz-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(255,90,54,0.06);
+  border: 1px solid rgba(255,90,54,0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  animation: fadeIn 200ms ease;
+}
+
+/* --- Code Editor with Line Numbers --- */
+.editor-wrapper {
+  display: flex;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.editor-line-nums {
+  padding: 12px 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #666;
+  text-align: right;
+  background: rgba(0,0,0,0.18);
+  min-width: 32px;
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 170px;
+  background-color: transparent;
+  color: var(--code-text);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 12px;
+  border-radius: 0;
+  border: none;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 0;
+}
+
+/* --- Test Cases (v2) --- */
+.test-cases-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.test-summary-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success-color);
+  background: var(--success-bg);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.test-case-io {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.io-label {
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--muted-gray);
+  min-width: 52px;
+}
+
+.hidden-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(150,150,150,0.12);
+  color: var(--muted-gray);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.tc-pass-card {
+  border-color: rgba(16,185,129,0.4) !important;
+  background: rgba(16,185,129,0.04) !important;
+  transition: border-color 300ms ease, background 300ms ease;
+}
+
+.tc-fail-card {
+  border-color: rgba(239,68,68,0.4) !important;
+  background: rgba(239,68,68,0.04) !important;
+  transition: border-color 300ms ease, background 300ms ease;
+}
+
+.tc-animate {
+  animation: popIn 250ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Loading Spinner --- */
+.run-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(150,150,150,0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Run Code Result Boxes --- */
+.run-result-success {
+  background: var(--success-bg);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.run-result-partial {
+  background: var(--warning-bg);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.run-result-error {
+  background: var(--missed-bg);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.run-result-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.run-result-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: monospace;
+  line-height: 1.5;
+}
+
+.tc-pass { color: var(--success-color); font-weight: 700; margin-right: 6px; }
+.tc-fail { color: var(--missed-color); font-weight: 700; margin-right: 6px; }
+
+/* --- Reset / Link Button --- */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn-link:hover { color: var(--text-primary); }
+
+/* --- Proof Progress Bar --- */
+.proof-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.proof-step {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  opacity: 0.5;
+  transition: all 200ms ease;
+}
+
+.proof-step.done {
+  color: var(--success-color);
+  opacity: 1;
+}
+
+.proof-step-arrow {
+  font-size: 10px;
+  color: var(--muted-gray);
+}
+
+/* --- Proof Warning --- */
+.proof-warning {
+  background: var(--warning-bg);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--warning-color);
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+/* --- Review Modal Items --- */
+.review-item {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.review-item.review-correct { border-color: rgba(16,185,129,0.35); }
+.review-item.review-wrong { border-color: rgba(239,68,68,0.35); }
+
+.review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.review-verdict { font-size: 11px; font-weight: 700; }
+.review-item.review-correct .review-verdict { color: var(--success-color); }
+.review-item.review-wrong .review-verdict { color: var(--missed-color); }
+
+.review-question {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.review-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.review-ans-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.review-lbl {
+  color: var(--text-secondary);
+  font-weight: 600;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.ans-correct-text { color: var(--success-color); font-weight: 700; }
+.ans-wrong-text { color: var(--missed-color); font-weight: 700; }
+
+.review-explanation {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
+}
+

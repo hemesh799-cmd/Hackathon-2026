@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ABTalks 60-Day Coding Challenge - Dashboard</title>
+  <meta name="description" content="ABTalks 60-Day Coding Challenge Dashboard — track your daily builds and coding progress.">
   <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -22,6 +23,7 @@
     <main class="app-main">
       <section id="view-dashboard" class="page-view active">
         <div id="dashboard-reminder" class="card reminder-card"></div>
+        <div id="dashboard-challenge-card" class="card"></div>
         <div id="dashboard-today-progress" class="card"></div>
         <div id="dashboard-coding-progress" class="card"></div>
         <div class="card">
@@ -52,8 +54,13 @@
               <div id="stat-avg-score" class="stat-val">86%</div>
               <div class="stat-lbl">Avg Test Score</div>
             </div>
+            <div class="stat-card" style="grid-column: span 2;">
+              <div id="stat-builds-shipped" class="stat-val">10</div>
+              <div class="stat-lbl">Builds Shipped</div>
+            </div>
           </div>
         </div>
+        <div id="dashboard-recent-activity" class="card"></div>
         <div class="card">
           <div class="card-title"><span>Achievements</span></div>
           <div id="achievements-grid" class="achievements-grid"></div>

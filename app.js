@@ -1,4 +1,4 @@
-/* ABTalks 60-Day Coding Challenge Core Logic */
+/* ABTalks 60-Day Coding Challenge Core Logic — v2 Polished */
 
 (function () {
   'use strict';
@@ -26,6 +26,7 @@
       testCompleted: false,
       testScore: null,
       userAnswers: {},
+      quizFeedbackShown: {},
       codeLanguage: "python",
       codeContent: STARTER_CODES.python,
       codeExecuted: false,
@@ -55,6 +56,11 @@
       codingStreak: 7,
       progressPct: 75
     },
+    recentActivity: [
+      { day: 11, topic: "CSS Grid Masterclass", result: "4/5 MCQ", date: "Yesterday", status: "completed" },
+      { day: 10, topic: "JavaScript Closures", result: "3/3 Tests", date: "2 days ago", status: "completed" },
+      { day: 9, topic: "Flexbox Layout", result: "5/5 MCQ", date: "3 days ago", status: "completed" }
+    ],
     achievements: [
       { id: "first3", title: "First 3 Days", desc: "Started the chain", icon: "🔥", unlocked: true },
       { id: "streak7", title: "7 Day Streak", desc: "One week of consistency", icon: "⚡", unlocked: true },
@@ -65,22 +71,10 @@
     ]
   };
 
-  // --- Quiz Questions ---
+  // --- Quiz Questions (5 Daily Test Questions) ---
   const QUIZ_QUESTIONS = [
     {
       id: 1,
-      question: "Which data structure follows the LIFO (Last In First Out) principle?",
-      options: [
-        { letter: "A", text: "Queue" },
-        { letter: "B", text: "Stack" },
-        { letter: "C", text: "Array" },
-        { letter: "D", text: "Linked List" }
-      ],
-      correct: "B",
-      explanation: "A Stack adds and removes elements from the top (LIFO)."
-    },
-    {
-      id: 2,
       question: "Which CSS property is commonly used to create a responsive layout?",
       options: [
         { letter: "A", text: "position" },
@@ -89,86 +83,101 @@
         { letter: "D", text: "visibility" }
       ],
       correct: "B",
-      explanation: "'display: flex' and 'display: grid' drive modern responsive design."
+      explanation: "The 'display' property (using flex or grid) is the primary modern CSS tool for responsive layouts."
+    },
+    {
+      id: 2,
+      question: "What is the main layout advantage of CSS Grid over Flexbox?",
+      options: [
+        { letter: "A", text: "Grid only works for text elements" },
+        { letter: "B", text: "Grid is 2-dimensional (rows & columns) while Flexbox is 1-dimensional" },
+        { letter: "C", text: "Grid has faster loading performance" },
+        { letter: "D", text: "Flexbox cannot align items vertically" }
+      ],
+      correct: "B",
+      explanation: "CSS Grid manages rows and columns simultaneously (2D), whereas Flexbox works along a single axis (1D)."
     },
     {
       id: 3,
-      question: "What HTML meta tag is required for proper mobile responsive rendering?",
+      question: "What is the time complexity of finding the maximum element in an unsorted array of N elements?",
       options: [
-        { letter: "A", text: '<meta name="viewport" content="width=device-width, initial-scale=1.0">' },
-        { letter: "B", text: '<meta name="screen" content="mobile-only">' },
-        { letter: "C", text: '<meta name="responsive" content="true">' },
-        { letter: "D", text: '<meta name="zoom" content="disable">' }
+        { letter: "A", text: "O(1)" },
+        { letter: "B", text: "O(log N)" },
+        { letter: "C", text: "O(N)" },
+        { letter: "D", text: "O(N²)" }
       ],
-      correct: "A",
-      explanation: "The viewport meta tag scales content to device width."
+      correct: "C",
+      explanation: "You must inspect each array element once, resulting in linear O(N) time complexity."
     },
     {
       id: 4,
-      question: "In Flexbox, which property aligns items along the main axis?",
+      question: "Which CSS media query property tests the max viewport width of a mobile screen?",
       options: [
-        { letter: "A", text: "align-items" },
-        { letter: "B", text: "justify-content" },
-        { letter: "C", text: "align-content" },
-        { letter: "D", text: "flex-direction" }
+        { letter: "A", text: "screen-width" },
+        { letter: "B", text: "max-width" },
+        { letter: "C", text: "resolution" },
+        { letter: "D", text: "device-aspect" }
       ],
       correct: "B",
-      explanation: "'justify-content' aligns flex items along the main axis."
+      explanation: "'max-width' allows targeting viewports up to a specific pixel width (e.g. max-width: 390px)."
     },
     {
       id: 5,
-      question: "Which relative CSS unit is based on the root font size?",
+      question: "Which CSS unit is relative to the root element's font size?",
       options: [
         { letter: "A", text: "px" },
-        { letter: "B", text: "rem" },
-        { letter: "C", text: "pt" },
+        { letter: "B", text: "em" },
+        { letter: "C", text: "rem" },
         { letter: "D", text: "vh" }
       ],
-      correct: "B",
-      explanation: "'rem' scales relative to the root font size."
+      correct: "C",
+      explanation: "'rem' (root em) scales relative to the font size set on the root <html> element."
     }
   ];
 
-  // State loading & persistence
+  // --- State Loading & Persistence ---
   let appState = (function loadState() {
     try {
-      const saved = localStorage.getItem("abtalks_state");
+      const saved = localStorage.getItem("abtalks_state_v2");
       if (saved) {
-        return { ...DEFAULT_STATE, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        return {
+          ...DEFAULT_STATE,
+          ...parsed,
+          day12: { ...DEFAULT_STATE.day12, ...parsed.day12 },
+          stats: { ...DEFAULT_STATE.stats, ...parsed.stats },
+          codingProgress: { ...DEFAULT_STATE.codingProgress, ...parsed.codingProgress },
+          missedDay: { ...DEFAULT_STATE.missedDay, ...parsed.missedDay },
+          user: { ...DEFAULT_STATE.user, ...parsed.user }
+        };
       }
     } catch (e) {
       console.warn("Failed to load state", e);
     }
-    return DEFAULT_STATE;
+    return JSON.parse(JSON.stringify(DEFAULT_STATE));
   })();
 
   function saveState() {
     try {
-      localStorage.setItem("abtalks_state", JSON.stringify(appState));
+      localStorage.setItem("abtalks_state_v2", JSON.stringify(appState));
     } catch (e) {
       console.error("Failed to save state", e);
     }
   }
 
-  // Theme support
+  // --- Theme Support ---
   function applyTheme(theme) {
     let effectiveTheme = theme;
     if (theme === "system") {
       effectiveTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     }
-
     if (effectiveTheme === "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
-
     document.querySelectorAll(".theme-opt-btn").forEach(btn => {
-      if (btn.dataset.themeVal === theme) {
-        btn.classList.add("selected");
-      } else {
-        btn.classList.remove("selected");
-      }
+      btn.classList.toggle("selected", btn.dataset.themeVal === theme);
     });
   }
 
@@ -176,7 +185,7 @@
     if (appState.theme === "system") applyTheme("system");
   });
 
-  // Routing
+  // --- Routing ---
   function navigateTo(path, pushState = true) {
     if (pushState) {
       try {
@@ -192,23 +201,16 @@
     const hash = window.location.hash;
     if (hash && hash.includes("day/12")) return "/day/12";
     if (hash && hash.includes("dashboard")) return "/dashboard";
-
     let rawPath = window.location.pathname.replace(/\/+$/, "");
-    if (rawPath.includes("/day/12") || rawPath.endsWith("day/12")) {
-      return "/day/12";
-    }
-    if (rawPath.includes("/dashboard") || rawPath.endsWith("dashboard")) {
-      return "/dashboard";
-    }
+    if (rawPath.includes("/day/12") || rawPath.endsWith("day/12")) return "/day/12";
+    if (rawPath.includes("/dashboard") || rawPath.endsWith("dashboard")) return "/dashboard";
     return "/dashboard";
   }
 
   function renderRoute(path) {
-    const norm = getNormalizedPath();
-
     document.querySelectorAll(".page-view").forEach(el => el.classList.remove("active"));
     document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
-
+    const norm = getNormalizedPath();
     if (norm === "/day/12") {
       document.getElementById("view-day12")?.classList.add("active");
       document.getElementById("nav-day12")?.classList.add("active");
@@ -224,9 +226,11 @@
   window.addEventListener("popstate", () => renderRoute(getNormalizedPath()));
   window.addEventListener("hashchange", () => renderRoute(getNormalizedPath()));
 
-  // Render Dashboard View
+  // =============================================================
+  // DASHBOARD RENDER
+  // =============================================================
   function renderDashboardView() {
-    // 1. Reminder
+    // 1. Reminder / Today's Challenge Banner (Feature 8)
     const reminderCard = document.getElementById("dashboard-reminder");
     if (reminderCard) {
       if (appState.day12.daySubmitted) {
@@ -245,14 +249,38 @@
             <span class="reminder-icon">🔥</span>
             <span class="reminder-title">Today's build is waiting.</span>
           </div>
-          <p class="reminder-sub">Estimated time: 45 min • Mobile Layouts & Array Algorithms</p>
+          <p class="reminder-sub">Estimated time: 45 min</p>
           <button class="btn-primary" id="btn-start-mission">Start today's mission →</button>
         `;
         document.getElementById("btn-start-mission")?.addEventListener("click", () => navigateTo("/day/12"));
       }
     }
 
-    // 2. Today's Progress Card
+    // 2. Today's Challenge Card
+    const challengeCardEl = document.getElementById("dashboard-challenge-card");
+    if (challengeCardEl) {
+      challengeCardEl.innerHTML = `
+        <div class="card-title">
+          <span>TODAY'S CHALLENGE</span>
+          <span class="badge" style="background: rgba(16,185,129,0.12); color: var(--success-color);">Easy • +50 XP</span>
+        </div>
+        <div class="challenge-preview-box">
+          <div class="challenge-preview-title">🧩 Find the Largest Element</div>
+          <div class="challenge-preview-desc">Given an array of integers, find and print the largest element.</div>
+          <div class="challenge-preview-meta">
+            <span class="challenge-tag">Array</span>
+            <span class="challenge-tag">Searching</span>
+            <span class="challenge-tag">O(N)</span>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-go-challenge" style="margin-top: 12px;">
+          ${appState.day12.codePassed ? '✓ Problem Solved' : 'Start Challenge →'}
+        </button>
+      `;
+      document.getElementById("btn-go-challenge")?.addEventListener("click", () => navigateTo("/day/12"));
+    }
+
+    // 3. Today's Progress Checklist
     const todayProgressContainer = document.getElementById("dashboard-today-progress");
     if (todayProgressContainer) {
       const hasGh = !!appState.day12.githubProof;
@@ -264,12 +292,13 @@
         </div>
         <div class="today-checklist">
           <div class="checklist-item done">✓ Mission Brief</div>
-          <div class="checklist-item done">✓ Learn Concepts</div>
           <div class="checklist-item ${appState.day12.testCompleted ? 'done' : 'pending'}">
-            ${appState.day12.testCompleted ? '✓ MCQ Quick Check' : '○ MCQ Quick Check'}
+            ${appState.day12.testCompleted ? '✓ Daily Test' : '○ Daily Test'}
+            ${appState.day12.testCompleted && appState.day12.testScore !== null ? `<span class="checklist-score">${appState.day12.testScore}/5</span>` : ''}
           </div>
           <div class="checklist-item ${appState.day12.codePassed ? 'done' : 'pending'}">
             ${appState.day12.codePassed ? '✓ Coding Challenge' : '○ Coding Challenge'}
+            ${appState.day12.codePassed ? `<span class="checklist-score">${appState.day12.passedTestCount}/3 tests</span>` : ''}
           </div>
           <div class="checklist-item ${hasGh ? 'done' : 'pending'}">
             ${hasGh ? '✓ GitHub Proof' : '○ GitHub Proof'}
@@ -281,36 +310,43 @@
       `;
     }
 
-    // 3. Coding Progress Card
+    // 4. Coding Progress Card
     const codingProgressContainer = document.getElementById("dashboard-coding-progress");
     if (codingProgressContainer) {
       const p = appState.codingProgress;
       codingProgressContainer.innerHTML = `
         <div class="card-title">
-          <span>CODING PROGRESS</span>
+          <span>YOUR CODING PROGRESS</span>
         </div>
         <div class="coding-progress-grid">
-          <div>
-            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.problemsSolved}</div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Problems Solved</div>
+          <div class="coding-progress-item">
+            <div class="coding-progress-val">${p.problemsSolved}</div>
+            <div class="coding-progress-lbl">Problems Solved</div>
           </div>
-          <div>
-            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.mcqsCompleted}</div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">MCQs Completed</div>
+          <div class="coding-progress-item">
+            <div class="coding-progress-val">${p.mcqsCompleted}</div>
+            <div class="coding-progress-lbl">MCQs Completed</div>
           </div>
-          <div>
-            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.accuracy}%</div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">MCQ Accuracy</div>
+          <div class="coding-progress-item">
+            <div class="coding-progress-val">${p.accuracy}%</div>
+            <div class="coding-progress-lbl">MCQ Accuracy</div>
           </div>
-          <div>
-            <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);">${p.codingStreak} 🔥</div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Coding Streak</div>
+          <div class="coding-progress-item">
+            <div class="coding-progress-val">${p.codingStreak} 🔥</div>
+            <div class="coding-progress-lbl">Coding Streak</div>
           </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-inner" style="width: ${p.progressPct}%"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-secondary); font-weight: 600;">
+          <span>${p.progressPct}% of Day 12 unlocked</span>
+          <span>Day 12 / 60</span>
         </div>
       `;
     }
 
-    // 4. Build Chain
+    // 5. Build Chain Grid (Feature 3)
     const chainContainer = document.getElementById("build-chain-grid");
     if (chainContainer) {
       chainContainer.innerHTML = "";
@@ -318,32 +354,22 @@
         const bubble = document.createElement("div");
         bubble.className = "day-bubble";
         bubble.innerText = day;
-
         if (day < 11) {
           bubble.classList.add("completed");
         } else if (day === 11) {
-          if (appState.missedDay.isRecovered) {
-            bubble.classList.add("completed");
-          } else {
-            bubble.classList.add("missed");
-            bubble.innerText = "11 !";
-          }
+          bubble.classList.add(appState.missedDay.isRecovered ? "completed" : "missed");
+          if (!appState.missedDay.isRecovered) bubble.innerText = "11!";
         } else if (day === 12) {
-          if (appState.day12.daySubmitted) {
-            bubble.classList.add("completed");
-          } else {
-            bubble.classList.add("current");
-          }
+          bubble.classList.add(appState.day12.daySubmitted ? "completed" : "current");
         } else {
           bubble.classList.add("future");
         }
-
         bubble.addEventListener("click", () => showDayDetailModal(day));
         chainContainer.appendChild(bubble);
       }
     }
 
-    // 5. Streak Recovery Banner
+    // 6. Streak Recovery Banner (Feature 4)
     const recoveryContainer = document.getElementById("recovery-banner-slot");
     if (recoveryContainer) {
       if (!appState.missedDay.isRecovered) {
@@ -351,7 +377,8 @@
         recoveryContainer.innerHTML = `
           <div class="recovery-banner">
             <div class="recovery-title">You missed yesterday.</div>
-            <div class="recovery-desc">Your journey isn't over. STREAK RECOVERY available (1 remaining).</div>
+            <div class="recovery-desc">Your journey isn't over.</div>
+            <div style="font-size: 12px; font-weight: 800; color: var(--accent-color); margin-bottom: 8px;">STREAK RECOVERY — You have one recovery available.</div>
             <button class="recovery-btn" id="btn-recover-streak">Recover My Streak</button>
           </div>
         `;
@@ -359,27 +386,49 @@
       } else {
         recoveryContainer.style.display = "block";
         recoveryContainer.innerHTML = `
-          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 10px 14px; color: var(--success-color); font-size: 13px; font-weight: 700; margin-top: 10px;">
-            Streak recovered 🔥 (Day 11 restored)
+          <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 10px 14px; color: var(--success-color); font-size: 13px; font-weight: 700; margin-top: 10px;">
+            Streak recovered 🔥
           </div>
         `;
       }
     }
 
-    // 6. Stats Grid
+    // 7. Progress Statistics Section (Feature 6)
     const statDays = document.getElementById("stat-days-built");
     const statStreak = document.getElementById("stat-streak");
     const statTests = document.getElementById("stat-tests");
     const statAvg = document.getElementById("stat-avg-score");
-    const statBuilds = document.getElementById("stat-builds");
-
+    const statBuilds = document.getElementById("stat-builds-shipped");
     if (statDays) statDays.innerText = `${appState.stats.daysBuilt} / 60`;
     if (statStreak) statStreak.innerText = `${appState.stats.streak} days`;
     if (statTests) statTests.innerText = appState.stats.testsCompleted;
     if (statAvg) statAvg.innerText = `${appState.stats.avgScore}%`;
     if (statBuilds) statBuilds.innerText = appState.stats.buildsShipped;
 
-    // 7. Achievements
+    // 8. Recent Activity
+    const recentActivityEl = document.getElementById("dashboard-recent-activity");
+    if (recentActivityEl) {
+      const activities = appState.recentActivity;
+      recentActivityEl.innerHTML = `
+        <div class="card-title">
+          <span>RECENT ACTIVITY</span>
+        </div>
+        <div class="activity-list">
+          ${activities.map(act => `
+            <div class="activity-item">
+              <div class="activity-dot ${act.status}"></div>
+              <div class="activity-body">
+                <div class="activity-title">Day ${act.day} — ${act.topic}</div>
+                <div class="activity-meta">${act.result} • ${act.date}</div>
+              </div>
+              <span class="activity-badge ${act.status}">✓</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // 9. Achievements Section (Feature 5)
     const achievementsContainer = document.getElementById("achievements-grid");
     if (achievementsContainer) {
       achievementsContainer.innerHTML = "";
@@ -389,7 +438,7 @@
         card.innerHTML = `
           <div class="achievement-icon">${ach.icon}</div>
           <div class="achievement-title">${ach.title}</div>
-          <div class="achievement-desc">${ach.desc}</div>
+          <div class="achievement-desc">"${ach.desc}"</div>
         `;
         achievementsContainer.appendChild(card);
       });
@@ -407,25 +456,24 @@
     let statusText = "Future Day";
     let detailText = `Challenge details will unlock on day ${dayNum}.`;
     let scoreText = "";
-
     if (dayNum < 11) {
       statusText = "✓ Completed";
       detailText = dayNum % 2 === 0 ? "JavaScript DOM & State" : "HTML Semantic Structures";
       scoreText = "Score: 5/5";
     } else if (dayNum === 11) {
       if (appState.missedDay.isRecovered) {
-        statusText = "🔥 Recovered";
+        statusText = "✓ Completed";
         detailText = "CSS Grid Masterclass";
         scoreText = "Score: 4/5";
       } else {
         statusText = "⚠️ Missed";
-        detailText = "CSS Grid Masterclass (Missed)";
+        detailText = "CSS Grid Masterclass";
         scoreText = "Score: N/A";
       }
     } else if (dayNum === 12) {
       statusText = appState.day12.daySubmitted ? "✓ Completed" : "⚡ Current Active Day";
       detailText = "Largest Array Element Challenge";
-      scoreText = appState.day12.testScore !== null ? `Score: ${appState.day12.testScore}/5` : "Pending";
+      scoreText = appState.day12.testScore !== null ? `Score: ${appState.day12.testScore}/5` : "In Progress";
     }
 
     const drawer = document.getElementById("detail-modal");
@@ -437,19 +485,15 @@
             <span>DAY ${dayNum}</span>
             <span class="badge">${statusText}</span>
           </div>
-          <p style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">${detailText}</p>
+          <p style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">"${detailText}"</p>
           <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">${scoreText}</p>
           ${dayNum === 12 ? '<button class="btn-primary" id="modal-btn-day12">Go to Day 12 →</button>' : ''}
           <button class="btn-secondary" style="margin-top: 10px;" id="modal-btn-close">Close</button>
         </div>
       `;
       document.getElementById("modal-overlay")?.classList.add("active");
-
       if (dayNum === 12) {
-        document.getElementById("modal-btn-day12")?.addEventListener("click", () => {
-          closeModal();
-          navigateTo("/day/12");
-        });
+        document.getElementById("modal-btn-day12")?.addEventListener("click", () => { closeModal(); navigateTo("/day/12"); });
       }
       document.getElementById("modal-btn-close")?.addEventListener("click", closeModal);
     }
@@ -459,43 +503,43 @@
     document.getElementById("modal-overlay")?.classList.remove("active");
   }
 
-  // --- Day 12 Rendering ---
+  // =============================================================
+  // DAY 12 RENDER
+  // =============================================================
   let currentQuestionIndex = 0;
+  let isRunningCode = false;
 
   function renderDay12View() {
     const container = document.getElementById("day12-container");
     if (!container) return;
 
     if (appState.day12.daySubmitted) {
+      // Feature 9: Completion Celebration
       container.innerHTML = `
         <div class="celebration-box card">
           <div class="celebration-icon">✓</div>
           <h2 class="celebration-title">DAY 12 COMPLETE 🎉</h2>
-          <p class="celebration-sub">Your streak continues. 12 days built 🔥</p>
+          <p class="celebration-sub" style="margin-bottom: 4px; font-weight: 600;">Another day shipped.</p>
+          <p class="celebration-sub" style="color: var(--accent-color); font-weight: 700; margin-bottom: 16px;">Your streak is now ${appState.stats.streak} days 🔥 • 12 days built</p>
           
           <div class="celebration-metrics">
             <div class="metric-row">
-              <span class="metric-lbl">Built & Shipped</span>
-              <span class="metric-val">${appState.stats.daysBuilt} Days</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-lbl">MCQ Test Score</span>
+              <span class="metric-lbl">Test score:</span>
               <span class="metric-val">${appState.day12.testScore} / 5</span>
             </div>
             <div class="metric-row">
-              <span class="metric-lbl">Coding Challenge</span>
-              <span class="metric-val" style="color: var(--success-color)">3 / 3 Passed ✓</span>
+              <span class="metric-lbl">Build:</span>
+              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
             </div>
             <div class="metric-row">
-              <span class="metric-lbl">GitHub Proof</span>
-              <span class="metric-val" style="color: var(--success-color)">✓ Submitted</span>
+              <span class="metric-lbl">GitHub proof:</span>
+              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
             </div>
             <div class="metric-row">
-              <span class="metric-lbl">LinkedIn Proof</span>
-              <span class="metric-val" style="color: var(--success-color)">✓ Submitted</span>
+              <span class="metric-lbl">LinkedIn proof:</span>
+              <span class="metric-val" style="color: var(--success-color)">Submitted ✓</span>
             </div>
           </div>
-
           <button class="btn-primary" id="btn-back-dash">Back to Dashboard</button>
         </div>
       `;
@@ -504,48 +548,36 @@
     }
 
     const missionDone = appState.day12.missionCompleted;
-    const learnDone = appState.day12.learnCompleted;
     const testDone = appState.day12.testCompleted;
     const codeDone = appState.day12.codePassed;
-    const testCaseDone = appState.day12.codeExecuted;
     const proofDone = !!(appState.day12.githubProof && appState.day12.linkedinProof);
 
     container.innerHTML = `
-      <!-- 7-Stage Progress Indicator Stepper: BUILD -> LEARN -> MCQ -> CODE -> TEST -> PROVE -> SHIP -->
+      <!-- Stepper / Progress Indicator (Feature 2) -->
       <div class="stage-stepper">
         <div class="stage-step ${missionDone ? 'completed' : 'active'}">
           <div class="stage-dot">${missionDone ? '✓' : '1'}</div>
           <span>MISSION</span>
         </div>
         <div class="stage-line"></div>
-        <div class="stage-step ${learnDone ? 'completed' : (missionDone ? 'active' : '')}">
-          <div class="stage-dot">${learnDone ? '✓' : '2'}</div>
-          <span>LEARN</span>
-        </div>
-        <div class="stage-line"></div>
-        <div class="stage-step ${testDone ? 'completed' : (learnDone ? 'active' : '')}">
-          <div class="stage-dot">${testDone ? '✓' : '3'}</div>
-          <span>MCQ</span>
-        </div>
-        <div class="stage-line"></div>
-        <div class="stage-step ${codeDone ? 'completed' : (testDone ? 'active' : '')}">
-          <div class="stage-dot">${codeDone ? '✓' : '4'}</div>
-          <span>CODE</span>
-        </div>
-        <div class="stage-line"></div>
-        <div class="stage-step ${testCaseDone ? 'completed' : (codeDone ? 'active' : '')}">
-          <div class="stage-dot">${testCaseDone ? '✓' : '5'}</div>
+        <div class="stage-step ${testDone ? 'completed' : (missionDone ? 'active' : '')}">
+          <div class="stage-dot">${testDone ? '✓' : '2'}</div>
           <span>TEST</span>
         </div>
         <div class="stage-line"></div>
-        <div class="stage-step ${proofDone ? 'completed' : (testCaseDone ? 'active' : '')}">
-          <div class="stage-dot">${proofDone ? '✓' : '6'}</div>
+        <div class="stage-step ${codeDone ? 'completed' : (testDone ? 'active' : '')}">
+          <div class="stage-dot">${codeDone ? '✓' : '3'}</div>
+          <span>CODE</span>
+        </div>
+        <div class="stage-line"></div>
+        <div class="stage-step ${proofDone ? 'completed' : (codeDone ? 'active' : '')}">
+          <div class="stage-dot">${proofDone ? '✓' : '4'}</div>
           <span>PROOF</span>
         </div>
         <div class="stage-line"></div>
         <div class="stage-step ${appState.day12.daySubmitted ? 'completed' : ''}">
-          <div class="stage-dot">7</div>
-          <span>SHIP</span>
+          <div class="stage-dot">5</div>
+          <span>COMPLETE</span>
         </div>
       </div>
 
@@ -554,16 +586,17 @@
         <div class="mission-header">
           <div class="mission-tag">Day 12 Mission</div>
           <h2 class="mission-title">Find Largest Element & Responsive Viewports</h2>
-          <p class="mission-desc">Solve array optimization algorithms and build mobile responsive viewports.</p>
+          <p class="mission-desc">Solve array optimization algorithms and build mobile responsive viewports using Flexbox & Grid.</p>
         </div>
       </div>
 
-      <!-- Quick MCQ Section -->
+      <!-- Daily Coding Test Section (Feature 1) -->
       <div class="card" id="quiz-card">
         <div class="card-title">
-          <span>Quick Coding Check</span>
+          <span>Test your understanding</span>
           <span class="badge">${testDone ? 'Complete 🎉' : '5 Questions'}</span>
         </div>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Complete this short test before submitting today's build.</p>
         <div id="quiz-body"></div>
       </div>
 
@@ -571,21 +604,21 @@
       <div class="card" id="coding-card">
         <div class="card-title">
           <span>Today's Coding Problem</span>
-          <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">Easy • +50 XP</span>
+          <span class="badge" style="background: rgba(16,185,129,0.1); color: var(--success-color);">Easy • +50 XP</span>
         </div>
-        
+
         <div class="challenge-spec-box">
           <div style="font-weight: 800; font-size: 15px; margin-bottom: 4px;">Find the Largest Element</div>
           <p style="color: var(--text-secondary); margin-bottom: 8px;">Given an array of integers, find and print the largest element.</p>
-          
+
           <div class="spec-title">Input Format:</div>
-          <div class="spec-code-block">First line contains integer N.\nSecond line contains N space-separated integers.</div>
-          
+          <div class="spec-code-block">First line: integer N (number of elements)\nSecond line: N space-separated integers</div>
+
           <div class="spec-title">Output Format:</div>
-          <div class="spec-code-block">Print a single integer representing the maximum element in the array.</div>
+          <div class="spec-code-block">Print a single integer — the maximum element.</div>
 
           <div class="spec-title">Constraints:</div>
-          <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">1 <= N <= 10^5</div>
+          <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary); margin-top: 2px;">1 ≤ N ≤ 10⁵ &nbsp;|&nbsp; -10⁹ ≤ arr[i] ≤ 10⁹</div>
 
           <div class="spec-title">Sample Input:</div>
           <div class="spec-code-block">5\n10 20 5 30 15</div>
@@ -597,206 +630,453 @@
         <div class="lang-selector-row">
           <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Language:</span>
           <select id="lang-select-dropdown" class="lang-select-dropdown">
-            <option value="python" ${appState.day12.codeLanguage === 'python' ? 'selected' : ''}>Python ▼</option>
-            <option value="c" ${appState.day12.codeLanguage === 'c' ? 'selected' : ''}>C ▼</option>
-            <option value="cpp" ${appState.day12.codeLanguage === 'cpp' ? 'selected' : ''}>C++ ▼</option>
-            <option value="java" ${appState.day12.codeLanguage === 'java' ? 'selected' : ''}>Java ▼</option>
+            <option value="python" ${appState.day12.codeLanguage === 'python' ? 'selected' : ''}>Python</option>
+            <option value="c" ${appState.day12.codeLanguage === 'c' ? 'selected' : ''}>C</option>
+            <option value="cpp" ${appState.day12.codeLanguage === 'cpp' ? 'selected' : ''}>C++</option>
+            <option value="java" ${appState.day12.codeLanguage === 'java' ? 'selected' : ''}>Java</option>
           </select>
         </div>
 
-        <textarea id="code-editor" class="editor-textarea" spellcheck="false">${appState.day12.codeContent}</textarea>
+        <div class="editor-wrapper">
+          <div class="editor-line-nums" id="editor-line-nums">1</div>
+          <textarea id="code-editor" class="editor-textarea" spellcheck="false">${escapeHtml(appState.day12.codeContent)}</textarea>
+        </div>
 
         <!-- Test Cases -->
-        <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Test Cases</div>
+        <div class="test-cases-header">
+          <div style="font-size: 13px; font-weight: 700;">Test Cases</div>
+          ${appState.day12.codeExecuted ? `<div class="test-summary-badge">${appState.day12.passedTestCount} / 3 Passed</div>` : ''}
+        </div>
         <div class="test-cases-box">
-          <div class="test-case-card">
+          <div class="test-case-card" id="tc-card-1">
             <div class="test-case-header">
-              <span>✓ Test Case 1</span>
-              <span id="tc-1-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
-                ${appState.day12.codeExecuted ? 'Passed' : 'Pending'}
+              <span>Test Case 1</span>
+              <span id="tc-1-status" class="test-status ${getTestStatus(1)}">
+                ${getTestStatusLabel(1)}
               </span>
             </div>
-            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Input: 5 \n 10 20 5 30 15</div>
-            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Expected Output: 30</div>
+            <div class="test-case-io">
+              <span class="io-label">Input:</span>
+              <code>5 → [10, 20, 5, 30, 15]</code>
+            </div>
+            <div class="test-case-io">
+              <span class="io-label">Expected:</span>
+              <code>30</code>
+            </div>
           </div>
 
-          <div class="test-case-card">
+          <div class="test-case-card" id="tc-card-2">
             <div class="test-case-header">
-              <span>✓ Test Case 2</span>
-              <span id="tc-2-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
-                ${appState.day12.codeExecuted ? 'Passed' : 'Pending'}
+              <span>Test Case 2</span>
+              <span id="tc-2-status" class="test-status ${getTestStatus(2)}">
+                ${getTestStatusLabel(2)}
               </span>
             </div>
-            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Input: 4 \n 7 3 9 2</div>
-            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Expected Output: 9</div>
+            <div class="test-case-io">
+              <span class="io-label">Input:</span>
+              <code>4 → [7, 3, 9, 2]</code>
+            </div>
+            <div class="test-case-io">
+              <span class="io-label">Expected:</span>
+              <code>9</code>
+            </div>
           </div>
 
-          <div class="test-case-card">
+          <div class="test-case-card" id="tc-card-3">
             <div class="test-case-header">
-              <span>✗ Test Case 3 (Hidden)</span>
-              <span id="tc-3-status" class="test-status ${appState.day12.codeExecuted ? 'passed' : 'pending'}">
-                ${appState.day12.codeExecuted ? 'Passed' : 'Hidden'}
+              <span>Test Case 3 <span class="hidden-badge">Hidden</span></span>
+              <span id="tc-3-status" class="test-status ${getTestStatus(3)}">
+                ${getTestStatusLabel(3)}
               </span>
             </div>
-            <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">Hidden mock evaluation case</div>
+            <div class="test-case-io">
+              <span class="io-label">Input:</span>
+              <code>Hidden edge case</code>
+            </div>
+            <div class="test-case-io">
+              <span class="io-label">Expected:</span>
+              <code>Hidden</code>
+            </div>
           </div>
         </div>
 
         <div id="run-results-area" style="margin-bottom: 12px;"></div>
 
         <div style="display: flex; gap: 10px;">
-          <button class="btn-secondary" id="btn-run-code">Run Code</button>
-          <button class="btn-primary" id="btn-submit-code">Submit Code</button>
+          <button class="btn-secondary" id="btn-run-code">▶ Run Code</button>
+          <button class="btn-primary" id="btn-submit-code" ${appState.day12.codePassed ? 'disabled style="opacity:0.6;"' : ''}>
+            ${appState.day12.codePassed ? '✓ Submitted' : 'Submit Code'}
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button class="btn-link" id="btn-reset-code">↺ Reset Code</button>
         </div>
       </div>
 
-      <!-- Proof Submission Section -->
-      <div class="card">
+      <!-- Build Submission Flow Section (Feature 2) -->
+      <div class="card" id="proof-card">
         <div class="card-title">
-          <span>Submit Proof & Complete Day</span>
+          <span>Build Submission Flow</span>
+        </div>
+
+        <div class="proof-progress-bar">
+          <div class="proof-step ${missionDone ? 'done' : ''}">MISSION ${missionDone ? '✓' : ''}</div>
+          <div class="proof-step-arrow">→</div>
+          <div class="proof-step ${testDone ? 'done' : ''}">TEST ${testDone ? '✓' : ''}</div>
+          <div class="proof-step-arrow">→</div>
+          <div class="proof-step ${proofDone ? 'done' : ''}">PROOF ${proofDone ? '✓' : ''}</div>
+          <div class="proof-step-arrow">→</div>
+          <div class="proof-step ${appState.day12.daySubmitted ? 'done' : ''}">COMPLETE ${appState.day12.daySubmitted ? '✓' : ''}</div>
         </div>
 
         <div class="input-group">
-          <label class="input-label">GitHub Repository Proof</label>
+          <label class="input-label">📁 GitHub Repository Proof</label>
           <input type="text" id="input-github" class="form-input" placeholder="https://github.com/username/day12-build" value="${appState.day12.githubProof || ''}">
         </div>
 
         <div class="input-group">
-          <label class="input-label">LinkedIn Post Proof</label>
+          <label class="input-label">💼 LinkedIn Post Proof</label>
           <input type="text" id="input-linkedin" class="form-input" placeholder="https://linkedin.com/posts/day12-challenge" value="${appState.day12.linkedinProof || ''}">
         </div>
 
+        ${!testDone || !codeDone ? `<div class="proof-warning">⚠️ Complete the Daily Test and Coding Challenge first to enable submission.</div>` : ''}
+
         <button class="btn-primary" id="btn-submit-day" ${!(testDone && codeDone && appState.day12.githubProof && appState.day12.linkedinProof) ? 'disabled' : ''}>
-          Submit Day 12 →
+          🚀 Submit Day 12 →
         </button>
       </div>
     `;
 
-    // Dropdown change handler
+    // Wire up all event handlers
+    wireDay12Events();
+    updateEditorLineNumbers();
+    renderQuizBody();
+  }
+
+  function getTestStatus(tcNum) {
+    if (!appState.day12.codeExecuted) return "pending";
+    const passed = appState.day12.passedTestCount;
+    if (tcNum <= passed) return "passed";
+    return "failed";
+  }
+
+  function getTestStatusLabel(tcNum) {
+    if (!appState.day12.codeExecuted) return "Pending";
+    const passed = appState.day12.passedTestCount;
+    if (tcNum <= passed) return "✓ Passed";
+    return "✗ Failed";
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function wireDay12Events() {
+    // Language selector
     const langSelect = document.getElementById("lang-select-dropdown");
     langSelect?.addEventListener("change", () => {
       const lang = langSelect.value;
       appState.day12.codeLanguage = lang;
       appState.day12.codeContent = STARTER_CODES[lang];
+      appState.day12.codeExecuted = false;
+      appState.day12.passedTestCount = 0;
       saveState();
       renderDay12View();
     });
 
-    // Editor textarea change
+    // Code editor
     const codeEditor = document.getElementById("code-editor");
     codeEditor?.addEventListener("input", () => {
       appState.day12.codeContent = codeEditor.value;
       saveState();
+      updateEditorLineNumbers();
     });
 
-    // Run & Submit Code Action
+    // Run code
     document.getElementById("btn-run-code")?.addEventListener("click", runCodeRunner);
     document.getElementById("btn-submit-code")?.addEventListener("click", submitCodeRunner);
+    document.getElementById("btn-reset-code")?.addEventListener("click", () => {
+      appState.day12.codeContent = STARTER_CODES[appState.day12.codeLanguage];
+      appState.day12.codeExecuted = false;
+      appState.day12.passedTestCount = 0;
+      saveState();
+      renderDay12View();
+    });
 
-    // Proof Inputs
+    // Proof inputs
     const ghInput = document.getElementById("input-github");
     const liInput = document.getElementById("input-linkedin");
-    const submitBtn = document.getElementById("btn-submit-day");
+    const submitDayBtn = document.getElementById("btn-submit-day");
 
     function validateProofs() {
-      appState.day12.githubProof = ghInput.value.trim();
-      appState.day12.linkedinProof = liInput.value.trim();
+      appState.day12.githubProof = ghInput?.value.trim() || "";
+      appState.day12.linkedinProof = liInput?.value.trim() || "";
       saveState();
-
-      if (appState.day12.testCompleted && appState.day12.codePassed && appState.day12.githubProof && appState.day12.linkedinProof) {
-        submitBtn?.removeAttribute("disabled");
-      } else {
-        submitBtn?.setAttribute("disabled", "true");
+      const canSubmit = appState.day12.testCompleted && appState.day12.codePassed
+        && appState.day12.githubProof && appState.day12.linkedinProof;
+      if (submitDayBtn) {
+        if (canSubmit) submitDayBtn.removeAttribute("disabled");
+        else submitDayBtn.setAttribute("disabled", "true");
       }
     }
 
     ghInput?.addEventListener("input", validateProofs);
     liInput?.addEventListener("input", validateProofs);
-    submitBtn?.addEventListener("click", submitDayAction);
+    submitDayBtn?.addEventListener("click", submitDayAction);
+  }
 
-    renderQuizBody();
+  function updateEditorLineNumbers() {
+    const editor = document.getElementById("code-editor");
+    const lineNums = document.getElementById("editor-line-nums");
+    if (!editor || !lineNums) return;
+    const lines = editor.value.split("\n").length;
+    lineNums.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join("<br>");
+  }
+
+  // =============================================================
+  // CODE EVALUATION ENGINE (Smart Mock)
+  // =============================================================
+  function evaluateCode(code, language) {
+    const trimmed = code.trim();
+
+    if (!trimmed || trimmed.length < 5) {
+      return {
+        type: "compile_error",
+        error: `${language === 'python' ? 'SyntaxError' : 'CompilationError'}: Empty file — no code found.`,
+        passed: 0
+      };
+    }
+
+    const openBrackets = (trimmed.match(/[\(\[\{]/g) || []).length;
+    const closeBrackets = (trimmed.match(/[\)\]\}]/g) || []).length;
+    if (Math.abs(openBrackets - closeBrackets) > 2) {
+      return {
+        type: "compile_error",
+        error: `${language === 'c' || language === 'cpp' ? 'error' : 'SyntaxError'}: Mismatched brackets — check your code structure.`,
+        passed: 0
+      };
+    }
+
+    const hasMaxLogic = /max|largest|greatest|Math\.max|sort|max_element/i.test(trimmed);
+    const hasLoop = /for|while|forEach|reduce/i.test(trimmed);
+    const hasInput = /input|scanf|cin|Scanner|readline/i.test(trimmed);
+    const hasOutput = /print|printf|cout|System\.out|console\.log/i.test(trimmed);
+
+    let passed = 0;
+    if (hasOutput) passed = 1;
+    if (hasOutput && hasLoop) passed = 2;
+    if (hasOutput && hasLoop && (hasMaxLogic || hasInput)) passed = 3;
+
+    const isStarterCode = STARTER_CODES[language] && trimmed === STARTER_CODES[language].trim();
+    if (isStarterCode) passed = 3;
+
+    return { type: "success", passed };
   }
 
   function runCodeRunner() {
-    appState.day12.codeExecuted = true;
-    appState.day12.passedTestCount = 3;
-    saveState();
-
+    if (isRunningCode) return;
+    const codeEditor = document.getElementById("code-editor");
+    const code = codeEditor?.value || appState.day12.codeContent;
+    const runBtn = document.getElementById("btn-run-code");
+    const submitBtn = document.getElementById("btn-submit-code");
     const resultsArea = document.getElementById("run-results-area");
+
+    isRunningCode = true;
+    if (runBtn) { runBtn.disabled = true; runBtn.innerHTML = "⏳ Running..."; }
+    if (submitBtn) submitBtn.disabled = true;
     if (resultsArea) {
       resultsArea.innerHTML = `
-        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 12px;">
-          <div style="font-weight: 800; color: var(--success-color); margin-bottom: 4px;">Test Results: 3 / 3 Test Cases Passed</div>
-          <div style="font-size: 12px; color: var(--text-secondary);">✓ Test Case 1 Passed • ✓ Test Case 2 Passed • ✓ Test Case 3 Passed</div>
+        <div class="run-loading">
+          <div class="loading-spinner"></div>
+          <span>Compiling and running test cases...</span>
         </div>
       `;
     }
 
-    const tc1 = document.getElementById("tc-1-status");
-    const tc2 = document.getElementById("tc-2-status");
-    const tc3 = document.getElementById("tc-3-status");
-    if (tc1) { tc1.className = "test-status passed"; tc1.innerText = "Passed"; }
-    if (tc2) { tc2.className = "test-status passed"; tc2.innerText = "Passed"; }
-    if (tc3) { tc3.className = "test-status passed"; tc3.innerText = "Passed"; }
+    setTimeout(() => {
+      const result = evaluateCode(code, appState.day12.codeLanguage);
+      isRunningCode = false;
+
+      if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = "▶ Run Code"; }
+      if (submitBtn && !appState.day12.codePassed) submitBtn.disabled = false;
+
+      if (result.type === "compile_error") {
+        animateTestCases(0);
+        appState.day12.codeExecuted = true;
+        appState.day12.passedTestCount = 0;
+        saveState();
+        if (resultsArea) {
+          resultsArea.innerHTML = `
+            <div class="run-result-error">
+              <div class="run-result-title">⚠️ Compilation Error</div>
+              <div class="run-result-detail">${result.error}</div>
+            </div>
+          `;
+        }
+      } else {
+        const passed = result.passed;
+        appState.day12.codeExecuted = true;
+        appState.day12.passedTestCount = passed;
+        saveState();
+        animateTestCases(passed);
+        if (resultsArea) {
+          resultsArea.innerHTML = `
+            <div class="${passed === 3 ? 'run-result-success' : 'run-result-partial'}">
+              <div class="run-result-title">${passed === 3 ? '🎉 ' : ''}${passed} / 3 Test Cases Passed</div>
+              <div class="run-result-detail">
+                ${[1,2,3].map(i => `<span class="${i <= passed ? 'tc-pass' : 'tc-fail'}">${i <= passed ? '✓' : '✗'} Test ${i}</span>`).join(' ')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      const tcHeader = document.querySelector(".test-cases-header");
+      if (tcHeader) {
+        const existing = tcHeader.querySelector(".test-summary-badge");
+        if (existing) existing.remove();
+        const badge = document.createElement("div");
+        badge.className = "test-summary-badge";
+        badge.textContent = `${appState.day12.passedTestCount} / 3 Passed`;
+        tcHeader.appendChild(badge);
+      }
+    }, 1400);
+  }
+
+  function animateTestCases(passed) {
+    [1, 2, 3].forEach((i, idx) => {
+      setTimeout(() => {
+        const statusEl = document.getElementById(`tc-${i}-status`);
+        const cardEl = document.getElementById(`tc-card-${i}`);
+        if (statusEl) {
+          const isPassed = i <= passed;
+          statusEl.className = `test-status ${isPassed ? 'passed' : 'failed'} tc-animate`;
+          statusEl.textContent = isPassed ? "✓ Passed" : "✗ Failed";
+        }
+        if (cardEl) {
+          cardEl.classList.add(i <= passed ? 'tc-pass-card' : 'tc-fail-card');
+        }
+      }, idx * 300);
+    });
   }
 
   function submitCodeRunner() {
-    runCodeRunner();
-    appState.day12.codePassed = true;
-    appState.codingProgress.problemsSolved = 19;
-    saveState();
+    if (isRunningCode) return;
+    const codeEditor = document.getElementById("code-editor");
+    const code = codeEditor?.value || appState.day12.codeContent;
+    const runBtn = document.getElementById("btn-run-code");
+    const submitBtn = document.getElementById("btn-submit-code");
+    const resultsArea = document.getElementById("run-results-area");
 
-    // Show Coding Result Popup Modal
-    const drawer = document.getElementById("detail-modal");
-    if (drawer) {
-      drawer.innerHTML = `
-        <div class="drawer-content" style="text-align: center;">
-          <div class="drawer-handle"></div>
-          <div style="font-size: 38px; margin-bottom: 4px;">🎉</div>
-          <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Problem Solved!</h2>
-          <div style="font-size: 14px; font-weight: 700; color: var(--success-color); margin-bottom: 16px;">3 / 3 Test Cases Passed</div>
-          
-          <div class="celebration-metrics">
-            <div class="metric-row">
-              <span class="metric-lbl">Accuracy</span>
-              <span class="metric-val" style="color: var(--success-color)">100%</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-lbl">Difficulty</span>
-              <span class="metric-val">Easy</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-lbl">XP Earned</span>
-              <span class="metric-val" style="color: var(--accent-color)">+50</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-lbl">Streak</span>
-              <span class="metric-val">🔥 Maintained</span>
-            </div>
-          </div>
-
-          <button class="btn-primary" id="btn-continue-challenge">Continue Challenge →</button>
+    isRunningCode = true;
+    if (runBtn) runBtn.disabled = true;
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "⏳ Submitting..."; }
+    if (resultsArea) {
+      resultsArea.innerHTML = `
+        <div class="run-loading">
+          <div class="loading-spinner"></div>
+          <span>Running all test cases for submission...</span>
         </div>
       `;
-      document.getElementById("modal-overlay")?.classList.add("active");
-      document.getElementById("btn-continue-challenge")?.addEventListener("click", () => {
-        closeModal();
-        renderDay12View();
-      });
     }
+
+    setTimeout(() => {
+      const result = evaluateCode(code, appState.day12.codeLanguage);
+      isRunningCode = false;
+
+      const passed = result.type === "compile_error" ? 0 : result.passed;
+      appState.day12.codeExecuted = true;
+      appState.day12.passedTestCount = passed;
+
+      if (passed === 3) {
+        appState.day12.codePassed = true;
+        appState.codingProgress.problemsSolved = 19;
+        appState.codingProgress.codingStreak = 8;
+      }
+      saveState();
+      animateTestCases(passed);
+
+      if (runBtn) runBtn.disabled = false;
+
+      const drawer = document.getElementById("detail-modal");
+      if (drawer) {
+        if (passed === 3) {
+          drawer.innerHTML = `
+            <div class="drawer-content" style="text-align: center;">
+              <div class="drawer-handle"></div>
+              <div style="font-size: 44px; margin-bottom: 8px;">🎉</div>
+              <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Problem Solved!</h2>
+              <div style="font-size: 14px; font-weight: 700; color: var(--success-color); margin-bottom: 16px;">3 / 3 Test Cases Passed</div>
+              <div class="celebration-metrics">
+                <div class="metric-row">
+                  <span class="metric-lbl">Accuracy</span>
+                  <span class="metric-val" style="color: var(--success-color)">100%</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">Difficulty</span>
+                  <span class="metric-val">Easy</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">XP Earned</span>
+                  <span class="metric-val" style="color: var(--accent-color)">+50 XP 🔥</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">Coding Streak</span>
+                  <span class="metric-val">🔥 ${appState.codingProgress.codingStreak} days</span>
+                </div>
+              </div>
+              <button class="btn-primary" id="btn-continue-challenge">Continue Challenge →</button>
+            </div>
+          `;
+        } else {
+          drawer.innerHTML = `
+            <div class="drawer-content" style="text-align: center;">
+              <div class="drawer-handle"></div>
+              <div style="font-size: 44px; margin-bottom: 8px;">⚠️</div>
+              <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Partial Submission</h2>
+              <div style="font-size: 14px; font-weight: 700; color: var(--warning-color); margin-bottom: 16px;">${passed} / 3 Test Cases Passed</div>
+              <div class="celebration-metrics">
+                <div class="metric-row">
+                  <span class="metric-lbl">Failed Tests</span>
+                  <span class="metric-val" style="color: var(--missed-color)">${3 - passed} test case(s) failed</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">Hint</span>
+                  <span class="metric-val">Check your loop logic</span>
+                </div>
+              </div>
+              <button class="btn-secondary" id="btn-continue-challenge">Fix Code & Retry</button>
+            </div>
+          `;
+        }
+        document.getElementById("modal-overlay")?.classList.add("active");
+        document.getElementById("btn-continue-challenge")?.addEventListener("click", () => {
+          closeModal();
+          renderDay12View();
+        });
+      }
+    }, 1600);
   }
 
-  // Quiz Renderer
+  // =============================================================
+  // QUIZ RENDERER (Feature 1: Daily Coding Test)
+  // =============================================================
   function renderQuizBody() {
     const quizBody = document.getElementById("quiz-body");
     if (!quizBody) return;
 
     if (appState.day12.testCompleted) {
+      const score = appState.day12.testScore;
       quizBody.innerHTML = `
-        <div style="background: var(--accent-light); border: 1px solid rgba(255, 90, 54, 0.3); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px;">
-          <div style="font-size: 16px; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">🎉 Test Complete</div>
-          <div style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">${appState.day12.testScore} / 5 Correct</div>
-          <div style="font-size: 13px; font-weight: 700; color: var(--success-color); margin-bottom: 4px;">80% Accuracy • ✓ Strong understanding</div>
+        <div class="quiz-complete-box">
+          <div class="quiz-complete-icon">🎉</div>
+          <div class="quiz-complete-title">Test complete 🎉</div>
+          <div class="quiz-complete-score">${score} / 5 correct</div>
+          <div class="quiz-complete-accuracy" style="margin-top: 6px;">Great work. You are ready to submit today's build.</div>
         </div>
         <button class="btn-secondary" id="btn-review-answers">Review Answers</button>
       `;
@@ -806,44 +1086,71 @@
 
     const q = QUIZ_QUESTIONS[currentQuestionIndex];
     const selectedAns = appState.day12.userAnswers[q.id];
+    const feedbackShown = appState.day12.quizFeedbackShown[q.id];
+
+    // Progress dots
+    const progressDots = QUIZ_QUESTIONS.map((_, i) => {
+      const ans = appState.day12.userAnswers[QUIZ_QUESTIONS[i].id];
+      let cls = "q-dot";
+      if (i === currentQuestionIndex) cls += " q-dot-active";
+      else if (ans) cls += " q-dot-answered";
+      return `<div class="${cls}"></div>`;
+    }).join('');
 
     quizBody.innerHTML = `
+      <div class="quiz-progress-dots">${progressDots}</div>
+
       <div class="quiz-question-box">
         <div class="quiz-q-num">Question ${currentQuestionIndex + 1} of ${QUIZ_QUESTIONS.length}</div>
         <div class="quiz-q-text">${q.question}</div>
       </div>
 
       <div class="quiz-options">
-        ${q.options.map(opt => `
-          <div class="quiz-option ${selectedAns === opt.letter ? 'selected' : ''}" data-letter="${opt.letter}">
-            <div class="quiz-opt-letter">${opt.letter}</div>
-            <div>${opt.text}</div>
-          </div>
-        `).join('')}
+        ${q.options.map(opt => {
+          let optClass = "quiz-option";
+          if (feedbackShown) {
+            if (opt.letter === q.correct) optClass += " correct-answer";
+            else if (opt.letter === selectedAns && opt.letter !== q.correct) optClass += " wrong-answer";
+            else optClass += " dimmed-option";
+          } else if (selectedAns === opt.letter) {
+            optClass += " selected";
+          }
+          return `
+            <div class="${optClass}" data-letter="${opt.letter}" ${feedbackShown ? 'style="pointer-events:none;"' : ''}>
+              <div class="quiz-opt-letter">${opt.letter}</div>
+              <div>${opt.text}</div>
+              ${feedbackShown && opt.letter === q.correct ? '<span class="ans-feedback correct">✓ Correct</span>' : ''}
+              ${feedbackShown && opt.letter === selectedAns && opt.letter !== q.correct ? '<span class="ans-feedback wrong">✗ Wrong</span>' : ''}
+            </div>
+          `;
+        }).join('')}
       </div>
 
+      ${feedbackShown ? `<div class="quiz-explanation"><span>💡</span> ${q.explanation}</div>` : ''}
+
       <div class="quiz-nav-row">
-        <button class="btn-secondary" id="btn-prev-q" ${currentQuestionIndex === 0 ? 'disabled style="opacity:0.4;"' : ''}>Previous</button>
-        ${currentQuestionIndex === QUIZ_QUESTIONS.length - 1 ? 
-          `<button class="btn-primary" id="btn-submit-test">Submit Test</button>` : 
-          `<button class="btn-primary" id="btn-next-q">Next</button>`
+        <button class="btn-secondary" id="btn-prev-q" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Previous</button>
+        ${currentQuestionIndex === QUIZ_QUESTIONS.length - 1
+          ? `<button class="btn-primary" id="btn-submit-test" ${!selectedAns ? 'disabled' : ''}>Submit Test</button>`
+          : `<button class="btn-primary" id="btn-next-q" ${!selectedAns && !feedbackShown ? 'disabled' : ''}>Next</button>`
         }
       </div>
     `;
 
+    // Option click handler
     quizBody.querySelectorAll(".quiz-option").forEach(opt => {
       opt.addEventListener("click", () => {
+        if (feedbackShown) return;
         appState.day12.userAnswers[q.id] = opt.dataset.letter;
+        saveState();
+        appState.day12.quizFeedbackShown[q.id] = true;
         saveState();
         renderQuizBody();
       });
     });
 
     document.getElementById("btn-prev-q")?.addEventListener("click", () => {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuizBody();
-      }
+      if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuizBody(); }
     });
 
     document.getElementById("btn-next-q")?.addEventListener("click", () => {
@@ -859,20 +1166,19 @@
   function submitTest() {
     let score = 0;
     QUIZ_QUESTIONS.forEach(q => {
-      if (appState.day12.userAnswers[q.id] === q.correct) {
-        score++;
-      }
+      if (appState.day12.userAnswers[q.id] === q.correct) score++;
     });
-
     appState.day12.testCompleted = true;
     appState.day12.testScore = score;
-    appState.codingProgress.mcqsCompleted = 43;
+    appState.stats.testsCompleted += 1;
+    const accuracy = Math.round((appState.codingProgress.mcqsCompleted + score) / (appState.stats.testsCompleted * 5) * 100);
+    appState.codingProgress.mcqsCompleted = appState.codingProgress.mcqsCompleted + score;
+    appState.stats.avgScore = Math.min(100, accuracy || 86);
 
     if (score === 5) {
       const perfAch = appState.achievements.find(a => a.id === "perfect");
       if (perfAch) perfAch.unlocked = true;
     }
-
     saveState();
     renderDay12View();
   }
@@ -884,20 +1190,34 @@
     let reviewHtml = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
-        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">Quiz Review</h3>
+        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Review Answers</h3>
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Test Score: ${appState.day12.testScore} / 5 • ${Math.round((appState.day12.testScore / 5) * 100)}% Accuracy</div>
     `;
 
     QUIZ_QUESTIONS.forEach(q => {
       const userAns = appState.day12.userAnswers[q.id];
       const isCorrect = userAns === q.correct;
+      const userOptText = q.options.find(o => o.letter === userAns)?.text || "Not answered";
+      const correctOptText = q.options.find(o => o.letter === q.correct)?.text || "";
+
       reviewHtml += `
-        <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 10px;">
-          <div style="font-size: 12px; font-weight: 700; color: ${isCorrect ? 'var(--success-color)' : 'var(--missed-color)'}">
-            Question ${q.id}: ${isCorrect ? 'Correct ✓' : 'Incorrect ✗'}
+        <div class="review-item ${isCorrect ? 'review-correct' : 'review-wrong'}">
+          <div class="review-header">
+            <span>Q${q.id}</span>
+            <span class="review-verdict">${isCorrect ? '✓ Correct' : '✗ Incorrect'}</span>
           </div>
-          <div style="font-size: 13px; font-weight: 600; margin: 4px 0;">${q.question}</div>
-          <div style="font-size: 12px; color: var(--text-secondary);">Your choice: ${userAns || 'None'} • Correct: ${q.correct}</div>
-          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; font-style: italic;">${q.explanation}</div>
+          <div class="review-question">${q.question}</div>
+          <div class="review-answer">
+            <div class="review-ans-row">
+              <span class="review-lbl">Your answer:</span>
+              <span class="${isCorrect ? 'ans-correct-text' : 'ans-wrong-text'}">${userAns ? `${userAns}. ${userOptText}` : 'Not answered'}</span>
+            </div>
+            ${!isCorrect ? `<div class="review-ans-row">
+              <span class="review-lbl">Correct answer:</span>
+              <span class="ans-correct-text">${q.correct}. ${correctOptText}</span>
+            </div>` : ''}
+          </div>
+          <div class="review-explanation">💡 ${q.explanation}</div>
         </div>
       `;
     });
@@ -915,12 +1235,24 @@
   function submitDayAction() {
     appState.day12.daySubmitted = true;
     appState.stats.daysBuilt = 12;
-    appState.stats.buildsShipped = 10;
+    appState.stats.buildsShipped = 11;
+    appState.stats.streak = Math.max(appState.stats.streak, 12);
+    appState.codingProgress.progressPct = 100;
+    appState.recentActivity.unshift({
+      day: 12,
+      topic: "Largest Array Element",
+      result: `${appState.day12.passedTestCount}/3 Tests`,
+      date: "Just now",
+      status: "completed"
+    });
+    if (appState.recentActivity.length > 5) appState.recentActivity.pop();
     saveState();
     renderDay12View();
   }
 
-  // Profile Drawer
+  // =============================================================
+  // PROFILE / SETTINGS DRAWER (Feature 10)
+  // =============================================================
   function openProfileDrawer() {
     const drawer = document.getElementById("detail-modal");
     if (!drawer) return;
@@ -928,33 +1260,51 @@
     drawer.innerHTML = `
       <div class="drawer-content">
         <div class="drawer-handle"></div>
-        
         <div class="profile-avatar-row">
-          <div class="avatar-circle">A</div>
+          <div class="avatar-circle">${appState.user.name.charAt(0)}</div>
           <div>
             <div class="profile-name">${appState.user.name}</div>
-            <div class="profile-role">${appState.user.role} • ${appState.user.track}</div>
+            <div class="profile-role">${appState.user.role}</div>
+            <div style="font-size: 12px; color: var(--accent-color); font-weight: 700;">Current track: ${appState.user.track}</div>
           </div>
         </div>
 
-        <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-around; text-align: center;">
+        <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 8px;">
           <div>
             <div style="font-size: 16px; font-weight: 800; color: var(--accent-color);">${appState.stats.daysBuilt} / 60</div>
-            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">DAYS BUILT</div>
+            <div style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">DAYS BUILT</div>
           </div>
           <div>
-            <div style="font-size: 16px; font-weight: 800; color: var(--accent-color);">${appState.achievements.filter(a => a.unlocked).length}</div>
-            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">UNLOCKED</div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--accent-color);">${appState.stats.streak}</div>
+            <div style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">STREAK 🔥</div>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--accent-color);">${appState.achievements.filter(a => a.unlocked).length} unlocked</div>
+            <div style="font-size: 10px; color: var(--text-secondary); font-weight: 600;">ACHIEVEMENTS</div>
           </div>
         </div>
 
         <div style="margin-bottom: 16px;">
-          <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">APPEARANCE / THEME</label>
+          <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">THEME</label>
           <div class="theme-selector-grid">
-            <button class="theme-opt-btn ${appState.theme === 'light' ? 'selected' : ''}" data-theme-val="light">☀️ Light</button>
-            <button class="theme-opt-btn ${appState.theme === 'dark' ? 'selected' : ''}" data-theme-val="dark">🌙 Dark</button>
-            <button class="theme-opt-btn ${appState.theme === 'system' ? 'selected' : ''}" data-theme-val="system">💻 System</button>
+            <button class="theme-opt-btn ${appState.theme === 'light' ? 'selected' : ''}" data-theme-val="light">Light</button>
+            <button class="theme-opt-btn ${appState.theme === 'dark' ? 'selected' : ''}" data-theme-val="dark">Dark</button>
+            <button class="theme-opt-btn ${appState.theme === 'system' ? 'selected' : ''}" data-theme-val="system">System</button>
           </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">NOTIFICATIONS</label>
+            <button class="theme-opt-btn ${appState.notifications ? 'selected' : ''}" id="btn-toggle-notifs" style="min-height: 36px; padding: 4px 12px;">
+              ${appState.notifications ? 'On ✓' : 'Off'}
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">RESET STATE</label>
+          <button class="btn-secondary" id="btn-reset-progress" style="margin-top: 8px; color: var(--missed-color); border-color: var(--missed-color); min-height: 44px;">Reset All Progress</button>
         </div>
 
         <button class="btn-secondary" id="btn-close-profile">Close</button>
@@ -963,7 +1313,7 @@
 
     document.getElementById("modal-overlay")?.classList.add("active");
 
-    drawer.querySelectorAll(".theme-opt-btn").forEach(btn => {
+    drawer.querySelectorAll(".theme-opt-btn[data-theme-val]").forEach(btn => {
       btn.addEventListener("click", () => {
         appState.theme = btn.dataset.themeVal;
         saveState();
@@ -972,10 +1322,26 @@
       });
     });
 
+    document.getElementById("btn-toggle-notifs")?.addEventListener("click", () => {
+      appState.notifications = !appState.notifications;
+      saveState();
+      openProfileDrawer();
+    });
+
     document.getElementById("btn-close-profile")?.addEventListener("click", closeModal);
+    document.getElementById("btn-reset-progress")?.addEventListener("click", () => {
+      if (confirm("Reset all progress? This cannot be undone.")) {
+        localStorage.removeItem("abtalks_state_v2");
+        appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+        closeModal();
+        renderRoute(getNormalizedPath());
+      }
+    });
   }
 
-  // App Init
+  // =============================================================
+  // APP INIT
+  // =============================================================
   document.addEventListener("DOMContentLoaded", () => {
     applyTheme(appState.theme);
 
