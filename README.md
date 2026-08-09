@@ -4,7 +4,7 @@
 [![Design System](https://img.shields.io/badge/Design-Mobile--First%20390px-FF5A36)](https://hemesh799-cmd.github.io/Hackathon-2026/)
 [![Stack](https://img.shields.io/badge/Stack-Vanilla%20JS%20%7C%20HTML5%20%7C%20CSS3-171717)](https://hemesh799-cmd.github.io/Hackathon-2026/)
 
-**Live Deployment:** [https://hemesh799-cmd.github.io/Hackathon-2026/](https://hemesh799-cmd.github.io/Hackathon-2026/)
+**Live Deployment:** https://hackathon-pi-smoky.vercel.app
 
 ---
 
