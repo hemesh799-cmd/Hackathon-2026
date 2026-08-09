@@ -1,165 +1,87 @@
 # ABTalks — 60-Day Coding Challenge
 
-[![Final Project](https://img.shields.io/badge/Final%20Project-DEPLOYED-FF5A36)](https://hemesh799-cmd.github.io/Hackathon-2026/)
-[![Version](https://img.shields.io/badge/Version-v4.0%20MCQ--Only-171717)](https://github.com/hemesh799-cmd/Hackathon-2026)
-[![Mobile First](https://img.shields.io/badge/Design-Mobile--First%20390px-FF5A36)](https://hemesh799-cmd.github.io/Hackathon-2026/)
-
----
-
-## 📁 Repository Structure
-
-This repository contains **two project versions** of the ABTalks 60-Day Coding Challenge application:
-
-```
-Hackathon-2026/
-│
-├── FINAL-PROJECT/          ← ✅ FINAL DEPLOYED APPLICATION
-│   ├── index.html
-│   ├── app.js
-│   ├── styles.css
-│   ├── 404.html
-│   ├── dashboard/
-│   │   ├── index.html
-│   │   └── day/12/index.html
-│   ├── day/12/index.html
-│   └── PROMPTS.md
-│
-├── ABTALKS-REDESIGN/       ← 🔁 EARLIER REACT/VITE VERSION (Reference)
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   ├── data/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   └── README.md
-│
-└── README.md               ← This file
-```
-
----
-
-## ✅ FINAL-PROJECT — The Deployed Application
-
-> **This is the final, working, submitted hackathon application.**
+[![Live Application](https://img.shields.io/badge/Status-LIVE-10B981)](https://hemesh799-cmd.github.io/Hackathon-2026/)
+[![Design System](https://img.shields.io/badge/Design-Mobile--First%20390px-FF5A36)](https://hemesh799-cmd.github.io/Hackathon-2026/)
+[![Stack](https://img.shields.io/badge/Stack-Vanilla%20JS%20%7C%20HTML5%20%7C%20CSS3-171717)](https://hemesh799-cmd.github.io/Hackathon-2026/)
 
 **Live Deployment:** [https://hemesh799-cmd.github.io/Hackathon-2026/](https://hemesh799-cmd.github.io/Hackathon-2026/)
 
-### What it is
-A fully interactive, mobile-first student web app for the ABTalks 60-Day Coding Challenge. Built with **vanilla HTML, CSS, and JavaScript** — no frameworks, no build step, no external backend.
+---
 
-### Routes
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page — Introduction to the 60-day challenge |
-| `/dashboard` | Student Dashboard — Streak, Build Chain, Achievements, Progress |
-| `/day/12` | Challenge Day — Mission brief, 10-question MCQ test, submission flow |
+## 🚀 Overview
 
-### Key Features
-- **10-Question Concept MCQ Test** — Data structures, algorithms, time complexity, sorting, OOP, HTML/CSS, JavaScript, SQL, and more
-- **Strict 3-state evaluation**: CORRECT ✓ / WRONG ✗ / NOT ATTEMPTED ○ — with predefined correct answers per question
-- **Score displayed out of 10** with percentage and full question-by-question review
-- **Build Chain** — 60-day visual grid showing completed, current, missed, and future days
-- **Streak Recovery** — One-time recovery for missed days
-- **Achievements Grid** — Unlockable milestones
-- **Personalized Dashboard Greeting** — "Hi, [Name] 👋" via profile setup
-- **GitHub + LinkedIn Proof Submission** — Required for Day completion
-- **4-step Day flow**: MISSION → TEST → PROOF → COMPLETE
-- **Dark/Light/System Theme** with localStorage persistence
-- **Mobile-first 390px design** — zero horizontal scrolling, 44px+ touch targets
+ABTalks is a mobile-first student product for the 60-Day Coding Challenge. Students choose a track, follow daily missions, test their understanding with interactive daily tests, track their build streaks, and submit proof of work (GitHub commit & LinkedIn post URLs).
 
-### Tech Stack
-- **HTML5** — Multi-page static site (SPA-style routing via path detection)
-- **Vanilla CSS** — Custom design system with CSS variables (dark/light themes)
-- **Vanilla JavaScript** — State management, routing, MCQ evaluation, localStorage
-- **Deployment** — GitHub Pages (`gh-pages` branch)
+---
 
-### Design System
-| Token | Value |
-|-------|-------|
-| Background | `#111111` (dark) / `#F7F7F5` (light) |
-| Card | `#191919` (dark) / `#FFFFFF` (light) |
-| Primary Accent | `#FF5A36` (orange) |
-| Success | `#10B981` (green) |
-| Error | `#EF4444` (red) |
-| Border Radius | 14–18px cards, 12px buttons |
-| Viewport Target | 390px mobile |
+## 🛠️ Tech Stack & Architecture
 
-### Running Locally
+- **Frontend Core**: Vanilla JavaScript (ES6+), HTML5, Vanilla CSS3 (Custom Design System with CSS Variables)
+- **State Management**: Local persistent state powered by `localStorage` (`abtalks_state_v2`)
+- **Routing**: Lightweight client-side hash & path router supporting dynamic routes (`/`, `/dashboard`, `/day/12`)
+- **Backend / DB**: None required — lightweight, fast, self-contained mock evaluation & persistent storage
+- **Deployment**: GitHub Pages (`gh-pages` branch) & static web servers
+
+---
+
+## ✨ Features
+
+- **Daily Concept MCQ Test (10 Questions)**
+  - Predefined correct answers across Computer Science fundamentals (Data Structures, Algorithms, Time Complexity, Searching/Sorting, OOP, HTML/CSS, JavaScript, SQL).
+  - Strict 3-state evaluation logic: `CORRECT` ✓, `WRONG` ✗, or `NOT ATTEMPTED` ○.
+  - Question-by-question result breakdown modal with explanations.
+  
+- **4-Step Challenge Day Progression**
+  - Linear flow: `MISSION -> TEST -> PROOF -> COMPLETE`.
+  - Proof of work requires valid GitHub Repository and LinkedIn Post links before unlocking final Day completion.
+
+- **Student Dashboard & Progress**
+  - Personalized Greeting (`Hi, [Name] 👋`) synced with Profile drawer settings.
+  - **Build Chain Grid**: 60-day visual bubble grid displaying completed, missed, active, and locked challenge days.
+  - **Streak & Streak Recovery**: Daily streak counter (`🔥 11 days`) with an automated streak recovery banner for missed days.
+  - **Achievements Grid**: Dynamic badges (e.g. 7 Day Streak, 10 Builds, Perfect Test).
+  - **Recent Activity Log**: Summary of recent daily completions and scores.
+
+- **Mobile-First & Modern UX**
+  - Tailored for exact 390px mobile viewports while scaling gracefully to desktop displays.
+  - Support for System, Light, and Dark themes.
+
+---
+
+## 📂 Project Structure
+
+```
+Hackathon-2026/
+├── index.html            # Primary landing page structure & route views
+├── app.js                # Core logic, state management, quiz evaluation & views
+├── styles.css            # Complete design system & custom CSS variables
+├── 404.html              # Single-page application route fallback
+├── PROMPTS.md            # AI prompts log used during development
+├── dashboard/            # Route endpoint wrapper for /dashboard
+│   └── index.html
+├── day/                  # Route endpoint wrapper for /day/12
+│   └── 12/
+│       └── index.html
+└── README.md             # Project documentation
+```
+
+---
+
+## 🚦 Navigation Routes
+
+- `/` — Landing page introducing ABTalks challenge, methodology, and primary CTAs.
+- `/dashboard` — Student Dashboard featuring current streak, build chain grid, learning stats, achievements, and active missions.
+- `/day/12` — Active Challenge Day featuring Mission brief, 10-question MCQ test, and GitHub/LinkedIn proof submission.
+
+---
+
+## 💻 Running Locally
+
+No installation or build build pipeline required. Serve the files with any static HTTP server:
+
 ```bash
-# No install required — pure HTML/CSS/JS
-# Just serve with any static file server:
+# Using Python
 python -m http.server 8080
-# Then open: http://localhost:8080/
 ```
 
----
-
-## 🔁 ABTALKS-REDESIGN — Earlier React/Vite Version (Reference)
-
-> **This is an earlier version built during initial development. It is provided for documentation and reference only.**
-
-An earlier iteration of ABTalks built with **React 18 + Vite + Tailwind CSS**, featuring a React component-based architecture with full routing via React Router DOM.
-
-### Tech Stack
-- **Framework**: React 18
-- **Build Tool**: Vite 5
-- **Routing**: React Router DOM v6
-- **Styling**: Tailwind CSS v3
-- **Icons**: Lucide React
-- **Data**: Local mock dataset
-
-### Running Locally
-```bash
-cd ABTALKS-REDESIGN
-npm install
-npm run dev
-# Open: http://localhost:5173
-```
-
-### Project Structure
-```
-src/
-├── pages/
-│   ├── LandingPage.jsx
-│   ├── DashboardPage.jsx
-│   ├── ChallengeDayPage.jsx
-│   └── ProfilePage.jsx
-├── components/
-│   ├── Header.jsx
-│   ├── BottomNavigation.jsx
-│   ├── BuildChain.jsx
-│   ├── DailyTestSection.jsx
-│   ├── Button.jsx, Card.jsx, Badge.jsx, ...
-├── data/
-│   └── mockData.js
-├── App.jsx
-└── main.jsx
-```
-
----
-
-## 📝 Development Journey
-
-| Version | Description |
-|---------|-------------|
-| **ABTALKS-REDESIGN** | Initial React + Vite + Tailwind prototype |
-| **FINAL-PROJECT v1** | Converted to vanilla HTML/CSS/JS, deployed on GitHub Pages |
-| **FINAL-PROJECT v2** | Added interactive MCQ test (5 questions), code editor, proof submission |
-| **FINAL-PROJECT v3** | Fixed MCQ evaluation (3-state: CORRECT/WRONG/NOT ATTEMPTED), profile system, personalized greetings |
-| **FINAL-PROJECT v4** | Removed coding challenge, expanded MCQ to 10 concept-based questions, updated day flow to MISSION→TEST→PROOF→COMPLETE |
-
----
-
-## 🏆 Hackathon Submission
-
-- **Final Application**: [`FINAL-PROJECT/`](./FINAL-PROJECT/)
-- **Live URL**: [https://hemesh799-cmd.github.io/Hackathon-2026/](https://hemesh799-cmd.github.io/Hackathon-2026/)
-- **Challenge**: ABTalks 60-Day Coding Challenge — Hackathon 2026
-- **Team**: Hemesh & Ashwin
-
----
-
-> **Note**: The `FINAL-PROJECT` is the only version that should be evaluated for the hackathon submission. `ABTALKS-REDESIGN` is included for documentation and development history purposes only.
+Open `http://localhost:8080/` in your browser.
